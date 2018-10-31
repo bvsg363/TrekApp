@@ -13,7 +13,9 @@ class MainActivity : AppCompatActivity() {
 
         login_button.setOnClickListener {
             val loginIntent = Intent(this, SignUpActivity::class.java)
+//            loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             startActivity(loginIntent)
+            finish()
         }
     }
 }
