@@ -11,11 +11,13 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
 
+
         login_button.setOnClickListener {
-            val loginIntent = Intent(this, SignUpActivity::class.java)
-//            loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            val loginIntent = Intent(this, HomeScreenActivity::class.java)
+            loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
             startActivity(loginIntent)
             finish()
         }
     }
+
 }
