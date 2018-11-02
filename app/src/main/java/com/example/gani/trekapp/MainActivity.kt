@@ -13,11 +13,24 @@ class MainActivity : AppCompatActivity() {
 
 
         login_button.setOnClickListener {
-            val loginIntent = Intent(this, HomeScreenActivity::class.java)
-            loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+            checkfeilds()
+        }
+
+        signup_button.setOnClickListener {
+            val loginIntent = Intent(this, SignUpActivity::class.java)
             startActivity(loginIntent)
-            finish()
         }
     }
+
+    fun checkfeilds() {
+
+
+
+        val loginIntent = Intent(this, HomeScreenActivity::class.java)
+        loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+        startActivity(loginIntent)
+        finish()
+    }
+
 
 }

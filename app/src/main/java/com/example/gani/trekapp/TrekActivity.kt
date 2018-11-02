@@ -1,9 +1,11 @@
 package com.example.gani.trekapp
 
+import android.content.Intent
 import android.Manifest
 import android.content.IntentSender
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import kotlinx.android.synthetic.main.activity_trek.*
 import android.widget.Toast
 import android.content.pm.PackageManager
 import android.location.Location
@@ -28,6 +30,15 @@ class TrekActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_trek)
+
+        textView3.text = intent.getStringExtra("trekName")
+
+        start_navigation_button.setOnClickListener {
+            val intent = Intent(this, NavigationActivity::class.java)
+            startActivity(intent)
+        }
+    }
+}
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         createLocationRequest()
