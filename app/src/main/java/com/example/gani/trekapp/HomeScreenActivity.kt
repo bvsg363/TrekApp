@@ -22,6 +22,8 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         setContentView(R.layout.activity_home_screen)
         setSupportActionBar(toolbar)
 
+        title = "Treks Available"
+
         val treksList : ArrayList<String> = ArrayList()
         treksList.add("Sameer Hill")
         treksList.add("Matheran")
