@@ -42,7 +42,6 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="28dp"
         android:text="LOGIN"
-        android:onClick="login"
         app:layout_constraintEnd_toEndOf="@+id/login_email"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="@+id/login_email"
