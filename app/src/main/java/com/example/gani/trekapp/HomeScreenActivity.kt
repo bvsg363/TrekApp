@@ -10,8 +10,10 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_home_screen.*
 import kotlinx.android.synthetic.main.app_bar_home_screen.*
+import kotlinx.android.synthetic.main.content_home_screen.*
 
 class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -20,11 +22,14 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         setContentView(R.layout.activity_home_screen)
         setSupportActionBar(toolbar)
 
+        val treksList : ArrayList<String> = ArrayList()
+        treksList.add("Sameer Hill")
+        treksList.add("Matheran")
+        treksList.add("Mahabaleshwar")
+
         fab.setOnClickListener { view ->
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
 //                    .setAction("Action", null).show()
-            val intent = Intent(this, TrekActivity::class.java)
-            startActivity(intent)
         }
 
         val toggle = ActionBarDrawerToggle(
@@ -35,7 +40,15 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         nav_view.setNavigationItemSelectedListener(this)
 
         recycler_view.layoutManager = LinearLayoutManager(this)
+        recycler_view.adapter = TreksListAdapter(treksList, this)
 
+        (recycler_view.adapter as TreksListAdapter).onItemClick = {
+            str ->
+//            Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
+            val intent = Intent(this, TrekActivity::class.java)
+            intent.putExtra("trekName", str)
+            startActivity(intent)
+        }
     }
 
     override fun onBackPressed() {
@@ -65,22 +78,15 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         // Handle navigation view item clicks here.
         when (item.itemId) {
-            R.id.nav_camera -> {
+            R.id.nav_past_treks -> {
                 // Handle the camera action
             }
-            R.id.nav_gallery -> {
+
+            R.id.nav_offline_treks -> {
 
             }
-            R.id.nav_slideshow -> {
 
-            }
-            R.id.nav_manage -> {
-
-            }
-            R.id.nav_share -> {
-
-            }
-            R.id.nav_send -> {
+            R.id.nav_logout -> {
 
             }
         }

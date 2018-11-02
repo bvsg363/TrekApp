@@ -11,10 +11,12 @@ class SignUpActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_sign_up)
 
-        val signupIntent = Intent(this, HomeScreenActivity::class.java)
 
         button2.setOnClickListener {
+            val signupIntent = Intent(this, HomeScreenActivity::class.java)
+
             startActivity(signupIntent)
+            finishAffinity()
         }
     }
 }

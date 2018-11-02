@@ -21,7 +21,8 @@
             android:name=".HomeScreenActivity"
             android:label="@string/title_activity_home_screen"
             android:theme="@style/AppTheme.NoActionBar" />
-        <activity android:name=".TrekActivity"></activity>
+        <activity android:name=".TrekActivity" />
+        <activity android:name=".NavigationActivity"></activity>
     </application>
 
 </manifest>
