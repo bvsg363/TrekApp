@@ -15,7 +15,6 @@ import android.util.Log
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
-import kotlinx.android.synthetic.main.activity_trek.*
 
 
 class TrekActivity : AppCompatActivity() {
@@ -37,8 +36,6 @@ class TrekActivity : AppCompatActivity() {
             val intent = Intent(this, NavigationActivity::class.java)
             startActivity(intent)
         }
-    }
-}
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this)
         createLocationRequest()
