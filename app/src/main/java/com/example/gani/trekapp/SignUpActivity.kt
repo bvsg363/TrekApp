@@ -12,7 +12,6 @@ import com.android.volley.Request
 import com.android.volley.Response
 import com.android.volley.toolbox.JsonObjectRequest
 import com.android.volley.toolbox.Volley
-import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.activity_sign_up.*
 import org.json.JSONObject
 
@@ -36,6 +35,7 @@ class SignUpActivity : AppCompatActivity() {
             }
 
             checkFeilds()
+            clearFields()
         }
     }
 
@@ -89,8 +89,12 @@ class SignUpActivity : AppCompatActivity() {
                 sendGetVolleySignup(emailId, password, username)
             }
         }
+    }
 
-
+    private fun clearFields() {
+        editText.text.clear()
+        editText5.text.clear()
+        editText6.text.clear()
     }
 
     fun doSignUp(){
