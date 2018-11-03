@@ -1,5 +1,6 @@
 package com.example.gani.trekapp
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -14,6 +15,7 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_home_screen.*
 import kotlinx.android.synthetic.main.app_bar_home_screen.*
 import kotlinx.android.synthetic.main.content_home_screen.*
+import kotlinx.android.synthetic.main.nav_header_home_screen.*
 
 class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -21,6 +23,8 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_screen)
         setSupportActionBar(toolbar)
+
+        title = "Treks Available"
 
         val treksList : ArrayList<String> = ArrayList()
         treksList.add("Sameer Hill")
@@ -44,11 +48,16 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         (recycler_view.adapter as TreksListAdapter).onItemClick = {
             str ->
-//            Toast.makeText(this, str, Toast.LENGTH_SHORT).show()
             val intent = Intent(this, TrekActivity::class.java)
             intent.putExtra("trekName", str)
             startActivity(intent)
         }
+
+//        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+
+
+//        nav_profile_mail.text = sharedPreferences.getString("email", getString(R.string.nav_header_subtitle))
+//        nav_profile_username.text = sharedPreferences.getString("username", getString(R.string.nav_header_title))
     }
 
     override fun onBackPressed() {
@@ -87,11 +96,21 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             }
 
             R.id.nav_logout -> {
-
+                logout()
             }
         }
 
         drawer_layout.closeDrawer(GravityCompat.START)
         return true
+    }
+
+    fun logout() {
+
+        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+        sharedPreferences.edit().clear().apply()
+
+        val intent = Intent(this, MainActivity::class.java)
+        startActivity(intent)
+        finish()
     }
 }
