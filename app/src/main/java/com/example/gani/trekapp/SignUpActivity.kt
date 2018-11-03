@@ -73,7 +73,7 @@ class SignUpActivity : AppCompatActivity() {
 
     }
 
-    fun checkFeilds(){
+    private fun checkFeilds(){
 
         val emailId = editText5.text.toString()
         val password = editText6.text.toString()
