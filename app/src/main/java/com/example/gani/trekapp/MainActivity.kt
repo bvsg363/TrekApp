@@ -43,6 +43,8 @@ class MainActivity : AppCompatActivity() {
                 Log.i("MainActivity", e.toString())
             }
             checkFields()
+            clearFields()
+
         }
 
         signup_button.setOnClickListener {
@@ -52,8 +54,6 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun checkFields() {
-
-
 
         val emailId = login_email.text.toString()
         val password = login_password.text.toString()
@@ -66,6 +66,11 @@ class MainActivity : AppCompatActivity() {
                 sendGetVolleyLogin(emailId, password)
             }
         }
+    }
+
+    private fun clearFields() {
+        login_email.text.clear()
+        login_password.text.clear()
     }
 
     private fun doLogin(){
@@ -94,7 +99,7 @@ class MainActivity : AppCompatActivity() {
             if (response.getString("status") == "success"){
 
                 Toast.makeText(this, "Login Success!", Toast.LENGTH_SHORT).show()
-                saveSesion(response.getInt("uid"), emailId, password)
+                saveSession(response.getInt("uid"), emailId, password)
                 doLogin()
             }
             else{
@@ -114,7 +119,7 @@ class MainActivity : AppCompatActivity() {
 //        super.onStop()
 //    }
 
-    fun saveSesion(uid : Int, emailId: String, password: String){
+    fun saveSession(uid : Int, emailId: String, password: String){
         val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
         val sharedPrefEditor =  sharedPreferences.edit()
 

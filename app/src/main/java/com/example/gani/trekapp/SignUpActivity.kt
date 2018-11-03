@@ -35,6 +35,7 @@ class SignUpActivity : AppCompatActivity() {
             }
 
             checkFeilds()
+            clearFields()
         }
     }
 
@@ -73,7 +74,7 @@ class SignUpActivity : AppCompatActivity() {
 
     }
 
-    fun checkFeilds(){
+    private fun checkFeilds(){
 
         val emailId = editText5.text.toString()
         val password = editText6.text.toString()
@@ -91,8 +92,12 @@ class SignUpActivity : AppCompatActivity() {
                 sendGetVolleySignup(emailId, password, username)
             }
         }
+    }
 
-
+    private fun clearFields() {
+        editText.text.clear()
+        editText5.text.clear()
+        editText6.text.clear()
     }
 
     fun doSignUp(){
