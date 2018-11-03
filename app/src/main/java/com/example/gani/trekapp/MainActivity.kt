@@ -102,6 +102,7 @@ class MainActivity : AppCompatActivity() {
             }
 
         }, Response.ErrorListener {
+            progressBar.visibility = View.INVISIBLE
             Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
         })
 

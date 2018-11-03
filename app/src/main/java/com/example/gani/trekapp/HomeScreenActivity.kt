@@ -3,7 +3,6 @@ package com.example.gani.trekapp
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
@@ -11,11 +10,13 @@ import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
+import android.view.View
 import kotlinx.android.synthetic.main.activity_home_screen.*
 import kotlinx.android.synthetic.main.app_bar_home_screen.*
 import kotlinx.android.synthetic.main.content_home_screen.*
-import kotlinx.android.synthetic.main.nav_header_home_screen.*
+import android.widget.TextView
+
+
 
 class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -53,7 +54,16 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             startActivity(intent)
         }
 
-//        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+
+
+        val navigationView = findViewById<View>(R.id.nav_view) as NavigationView
+        val headerView = navigationView.getHeaderView(0)
+        val navUsername = headerView.findViewById(R.id.nav_profile_username) as TextView
+        navUsername.text = sharedPreferences.getString("username", getString(R.string.nav_header_title))
+
+        val navUsermail = headerView.findViewById(R.id.nav_profile_mail) as TextView
+        navUsermail.text = sharedPreferences.getString("email", getString(R.string.nav_header_subtitle))
 
 
 //        nav_profile_mail.text = sharedPreferences.getString("email", getString(R.string.nav_header_subtitle))
