@@ -30,7 +30,6 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".TrekActivity" />
         <activity android:name=".NavigationActivity" />
-        <activity android:name=".TrekActivity" />
     </application>
 
 </manifest>
