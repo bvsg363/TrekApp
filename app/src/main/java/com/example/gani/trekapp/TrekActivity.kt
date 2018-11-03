@@ -76,19 +76,7 @@ class TrekActivity : AppCompatActivity() {
                         val toast = Toast.makeText(applicationContext, text, duration)
                         toast.show()
                     } else{
-                        val locationStr = "Latitude : " + location.latitude.toString() +
-                                "\nLongitude : " + location.longitude.toString() +
-                                "\nAltitude : " + location.altitude.toString() +
-                                "\nAccuracy : " + location.accuracy.toString() +
-                                "\nSpeed : " + location.speed.toString() +
-//                                "\nVertical Accuracy" + location.verticalAccuracyMeters.toString() +
-                                "\nTime : " + location.time.toString() +
-                                "\nBearing : " + location.bearing.toString()
-//                        val duration = Toast.LENGTH_SHORT
-//
-//                        val toast = Toast.makeText(applicationContext, locationStr, duration)
-//                        toast.show()
-                        location_text.text = locationStr
+                        displayLocation(location)
                     }
                     // Got last known location. In some rare situations this can be null.
                 }
@@ -101,23 +89,23 @@ class TrekActivity : AppCompatActivity() {
                 for (location in locationResult.locations){
                     // Update UI with location data
                     // ...
-                    val locationStr = "Latitude : " + location.latitude.toString() +
-                            "\nLongitude : " + location.longitude.toString() +
-                            "\nAltitude : " + location.altitude.toString() +
-                            "\nAccuracy : " + location.accuracy.toString() +
-                            "\nSpeed : " + location.speed.toString() +
-//                                "\nVertical Accuracy" + location.verticalAccuracyMeters.toString() +
-                            "\nTime : " + location.time.toString() +
-                            "\nBearing : " + location.bearing.toString()
-//                        val duration = Toast.LENGTH_SHORT
-//
-//                        val toast = Toast.makeText(applicationContext, locationStr, duration)
-//                        toast.show()
-                    location_text.text = locationStr
+                    displayLocation(location)
                 }
             }
         }
 
+    }
+
+    private fun displayLocation(location: Location) {
+        val locationStr = "Latitude : " + location.latitude.toString() +
+                "\nLongitude : " + location.longitude.toString() +
+                "\nAltitude : " + location.altitude.toString() +
+                "\nAccuracy : " + location.accuracy.toString() +
+                "\nSpeed : " + location.speed.toString() +
+                "\nTime : " + location.time.toString() +
+                "\nBearing : " + location.bearing.toString()
+
+        location_text.text = locationStr
     }
 
     override fun onResume() {
@@ -171,8 +159,8 @@ class TrekActivity : AppCompatActivity() {
 
     private fun createLocationRequest() {
         locationRequest = LocationRequest().apply {
-            interval = 10000
-            fastestInterval = 5000
+            interval = 1000
+            fastestInterval = 500
             priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         }
         val builder = LocationSettingsRequest.Builder()
@@ -215,69 +203,3 @@ class TrekActivity : AppCompatActivity() {
         onCreate(savedInstanceState)
     }
 }
-
-//class Location : AppCompatActivity() {
-//    internal lateinit var locationManager: LocationManager
-//    internal lateinit var mContext: Context
-//
-//    internal var locationListenerGPS: LocationListener = object : LocationListener {
-//        override fun onLocationChanged(location: android.location.Location) {
-//            val latitude = location.latitude
-//            val longitude = location.longitude
-//            val msg = "New Latitude: " + latitude + "New Longitude: " + longitude
-//            Toast.makeText(this@Location, msg, Toast.LENGTH_LONG).show()
-//        }
-//
-//        override fun onStatusChanged(provider: String, status: Int, extras: Bundle) {
-//
-//        }
-//
-//        override fun onProviderEnabled(provider: String) {
-//
-//        }
-//
-//        override fun onProviderDisabled(provider: String) {
-//
-//        }
-//    }
-//
-//    override fun onCreate(savedInstanceState: Bundle?) {
-//        super.onCreate(savedInstanceState)
-//        setContentView(R.layout.activity_trek)
-//        mContext = this
-//        locationManager = mContext.getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//        isLocationEnabled()
-//        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER,
-//                2000,
-//                10f, locationListenerGPS)
-//    }
-//
-//
-//    override fun onResume() {
-//        super.onResume()
-//        isLocationEnabled()
-//    }
-//
-//    private fun isLocationEnabled() {
-//
-//        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            val alertDialog = AlertDialog.Builder(mContext)
-//            alertDialog.setTitle("Enable Location")
-//            alertDialog.setMessage("Your locations setting is not enabled. Please enabled it in settings menu.")
-//            alertDialog.setPositiveButton("Location Settings", DialogInterface.OnClickListener { dialog, which ->
-//                val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-//                startActivity(intent)
-//            })
-//            alertDialog.setNegativeButton("Cancel", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
-//            val alert = alertDialog.create()
-//            alert.show()
-//        } else {
-//            val alertDialog = AlertDialog.Builder(mContext)
-//            alertDialog.setTitle("Confirm Location")
-//            alertDialog.setMessage("Your Location is enabled, please enjoy")
-//            alertDialog.setNegativeButton("Back to interface", DialogInterface.OnClickListener { dialog, which -> dialog.cancel() })
-//            val alert = alertDialog.create()
-//            alert.show()
-//        }
-//    }
-//}
