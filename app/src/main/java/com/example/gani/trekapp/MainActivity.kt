@@ -19,19 +19,16 @@ class MainActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
 
         val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
 
-        if (sharedPreferences.getInt("uid", 0) > 0){
+        if (sharedPreferences.contains("uid")){
             doLogin()
         }
 
+        setContentView(R.layout.activity_main)
+
         progressBar.visibility = View.INVISIBLE
-
-//        val requestQueue = Volley.newRequestQueue(this)
-
-
 
         login_button.setOnClickListener {
 
@@ -43,8 +40,6 @@ class MainActivity : AppCompatActivity() {
                 Log.i("MainActivity", e.toString())
             }
             checkFields()
-            clearFields()
-
         }
 
         signup_button.setOnClickListener {
@@ -76,7 +71,7 @@ class MainActivity : AppCompatActivity() {
     private fun doLogin(){
 
         val loginIntent = Intent(this, HomeScreenActivity::class.java)
-        loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
+//        loginIntent.flags = Intent.FLAG_ACTIVITY_CLEAR_TOP
         startActivity(loginIntent)
         finish()
     }
@@ -97,35 +92,37 @@ class MainActivity : AppCompatActivity() {
 
 
             if (response.getString("status") == "success"){
-
                 Toast.makeText(this, "Login Success!", Toast.LENGTH_SHORT).show()
-                saveSession(response.getInt("uid"), emailId, password)
+                saveSession(response.getInt("uid"), emailId, password, response.getString("user_name"))
+                clearFields()
                 doLogin()
             }
             else{
+                clearFields()
                 Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
             }
 
         }, Response.ErrorListener {
             progressBar.visibility = View.INVISIBLE
             Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
+            clearFields()
         })
 
         requestQueue.add(jsonRequest)
-
     }
 
 //    override fun onStop() {
 //        super.onStop()
 //    }
 
-    fun saveSession(uid : Int, emailId: String, password: String){
+    fun saveSession(uid : Int, emailId: String, password: String, username : String){
         val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
         val sharedPrefEditor =  sharedPreferences.edit()
 
         sharedPrefEditor.putInt("uid", uid)
         sharedPrefEditor.putString("email", emailId)
         sharedPrefEditor.putString("password", password)
+        sharedPrefEditor.putString("username", username)
         sharedPrefEditor.apply()
     }
 

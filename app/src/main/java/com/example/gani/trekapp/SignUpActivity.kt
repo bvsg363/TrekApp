@@ -35,7 +35,6 @@ class SignUpActivity : AppCompatActivity() {
             }
 
             checkFeilds()
-            clearFields()
         }
     }
 
@@ -59,15 +58,18 @@ class SignUpActivity : AppCompatActivity() {
 
                 Toast.makeText(this, "Registration Success!", Toast.LENGTH_SHORT).show()
                 saveSesion(response.getInt("uid"), emailId, password, username)
+                clearFields()
                 doSignUp()
             }
             else{
                 Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
+                clearFields()
             }
 
         }, Response.ErrorListener {
             progressBar2.visibility = View.INVISIBLE
             Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
+            clearFields()
         })
 
         requestQueue.add(jsonRequest)
