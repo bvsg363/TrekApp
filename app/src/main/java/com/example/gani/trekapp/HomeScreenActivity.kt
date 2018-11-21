@@ -3,19 +3,27 @@ package com.example.gani.trekapp
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.support.design.widget.Snackbar
 import android.support.design.widget.NavigationView
 import android.support.v4.view.GravityCompat
 import android.support.v7.app.ActionBarDrawerToggle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.LinearLayoutManager
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
-import android.widget.Toast
+import android.view.View
 import kotlinx.android.synthetic.main.activity_home_screen.*
 import kotlinx.android.synthetic.main.app_bar_home_screen.*
 import kotlinx.android.synthetic.main.content_home_screen.*
-import kotlinx.android.synthetic.main.nav_header_home_screen.*
+import android.widget.TextView
+import android.widget.Toast
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
+import kotlinx.android.synthetic.main.activity_main.*
+import org.json.JSONObject
+
 
 class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
@@ -26,10 +34,14 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         title = "Treks Available"
 
-        val treksList : ArrayList<String> = ArrayList()
-        treksList.add("Sameer Hill")
-        treksList.add("Matheran")
-        treksList.add("Mahabaleshwar")
+        val treksList : ArrayList<Pair<Int, String>> = ArrayList()
+        treksList.add(Pair(1, "Sameer Hill"))
+        treksList.add(Pair(2, "Matheran"))
+        treksList.add(Pair(3, "Mahabaleshwar"))
+
+        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+
+
 
         fab.setOnClickListener { view ->
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -53,7 +65,14 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             startActivity(intent)
         }
 
-//        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+
+        val navigationView = findViewById<View>(R.id.nav_view) as NavigationView
+        val headerView = navigationView.getHeaderView(0)
+        val navUsername = headerView.findViewById(R.id.nav_profile_username) as TextView
+        navUsername.text = sharedPreferences.getString("username", getString(R.string.nav_header_title))
+
+        val navUsermail = headerView.findViewById(R.id.nav_profile_mail) as TextView
+        navUsermail.text = sharedPreferences.getString("email", getString(R.string.nav_header_subtitle))
 
 
 //        nav_profile_mail.text = sharedPreferences.getString("email", getString(R.string.nav_header_subtitle))
@@ -89,6 +108,7 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         when (item.itemId) {
             R.id.nav_past_treks -> {
                 // Handle the camera action
+                getPastTreks()
             }
 
             R.id.nav_offline_treks -> {
@@ -104,11 +124,16 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         return true
     }
 
+    fun getPastTreks(){
+        val intent = Intent(this, PastTreks::class.java)
+        startActivity(intent)
+    }
+
+
     fun logout() {
-
         val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
-        sharedPreferences.edit().clear().apply()
 
+        sharedPreferences.edit().clear().apply()
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()

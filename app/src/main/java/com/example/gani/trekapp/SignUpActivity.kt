@@ -35,7 +35,6 @@ class SignUpActivity : AppCompatActivity() {
             }
 
             checkFeilds()
-            clearFields()
         }
     }
 
@@ -58,15 +57,19 @@ class SignUpActivity : AppCompatActivity() {
             if (response.getString("status") == "success"){
 
                 Toast.makeText(this, "Registration Success!", Toast.LENGTH_SHORT).show()
-                saveSesion(response.getInt("uid"), emailId, password)
+                saveSesion(response.getInt("uid"), emailId, password, username)
+                clearFields()
                 doSignUp()
             }
             else{
                 Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
+                clearFields()
             }
 
         }, Response.ErrorListener {
+            progressBar2.visibility = View.INVISIBLE
             Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
+            clearFields()
         })
 
         requestQueue.add(jsonRequest)
@@ -83,6 +86,8 @@ class SignUpActivity : AppCompatActivity() {
             username.trim().isEmpty() -> Toast.makeText(this, "Username field is Empty!", Toast.LENGTH_SHORT).show()
             emailId.trim().isEmpty() -> Toast.makeText(this, "Email field is Empty!", Toast.LENGTH_SHORT).show()
             password.trim().isEmpty() -> Toast.makeText(this, "Password field is Empty!", Toast.LENGTH_SHORT).show()
+            password.trim().length < 5 -> Toast.makeText(this, "Enter Password between 5-20 characters", Toast.LENGTH_SHORT).show()
+            password.trim().length > 20 -> Toast.makeText(this, "Enter Password between 5-20 characters", Toast.LENGTH_SHORT).show()
 
             else -> {
                 progressBar2.visibility = View.VISIBLE
@@ -103,13 +108,14 @@ class SignUpActivity : AppCompatActivity() {
         finishAffinity()
     }
 
-    fun saveSesion(uid : Int, emailId: String, password: String){
+    fun saveSesion(uid : Int, emailId: String, password: String, username: String){
         val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
         val sharedPrefEditor =  sharedPreferences.edit()
 
         sharedPrefEditor.putInt("uid", uid)
         sharedPrefEditor.putString("email", emailId)
         sharedPrefEditor.putString("password", password)
+        sharedPrefEditor.putString("username", username)
         sharedPrefEditor.apply()
     }
 }

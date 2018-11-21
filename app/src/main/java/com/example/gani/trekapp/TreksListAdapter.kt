@@ -8,12 +8,12 @@ import android.view.View
 import android.view.ViewGroup
 import kotlinx.android.synthetic.main.trek_list_item.view.*
 
-class TreksListAdapter(val items : ArrayList<String>, val context: Context) : RecyclerView.Adapter<ViewHolder>(){
+class TreksListAdapter(val items : ArrayList<Pair<Int, String>>, val context: Context) : RecyclerView.Adapter<ViewHolder>(){
 
     var onItemClick: ((String) -> Unit)? = null
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
-        (holder as MyViewHolder).listItem.text = items.get(position)
+        (holder as MyViewHolder).listItem.text = items.get(position).second
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -28,7 +28,7 @@ class TreksListAdapter(val items : ArrayList<String>, val context: Context) : Re
 
         init {
             view.setOnClickListener {
-                onItemClick?.invoke(items[adapterPosition])
+                onItemClick?.invoke(items[adapterPosition].second)
             }
         }
 
