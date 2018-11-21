@@ -27,9 +27,6 @@ import org.json.JSONObject
 
 class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemSelectedListener {
 
-    val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
-
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_home_screen)
@@ -37,10 +34,13 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         title = "Treks Available"
 
-        val treksList : ArrayList<String> = ArrayList()
-        treksList.add("Sameer Hill")
-        treksList.add("Matheran")
-        treksList.add("Mahabaleshwar")
+        val treksList : ArrayList<Pair<Int, String>> = ArrayList()
+        treksList.add(Pair(1, "Sameer Hill"))
+        treksList.add(Pair(2, "Matheran"))
+        treksList.add(Pair(3, "Mahabaleshwar"))
+
+        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+
 
 
         fab.setOnClickListener { view ->
@@ -125,45 +125,15 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
     }
 
     fun getPastTreks(){
-
-        val url = GlobalVariables().pastTreksUrl
-
-        val uid = sharedPreferences.getString("uid", "")
-
-        val finalUrl = "$url?uid=$uid"
-        val requestQueue = Volley.newRequestQueue(this)
-
-
-        val jsonRequest = JsonObjectRequest(Request.Method.GET, finalUrl, null, Response.Listener<JSONObject>{ response ->
-
-            progressBar.visibility = View.INVISIBLE
-            print(response)
-
-            Log.i("MainActivity", response.getString("status"))
-
-
-            if (response.getString("status") == "success"){
-                Toast.makeText(this, "Login Success!", Toast.LENGTH_SHORT).show()
-//                doLogin()
-            }
-            else{
-                Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
-            }
-
-        }, Response.ErrorListener {
-            progressBar.visibility = View.INVISIBLE
-            Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
-        })
-
-        requestQueue.add(jsonRequest)
-
+        val intent = Intent(this, PastTreks::class.java)
+        startActivity(intent)
     }
 
 
     fun logout() {
+        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
 
         sharedPreferences.edit().clear().apply()
-
         val intent = Intent(this, MainActivity::class.java)
         startActivity(intent)
         finish()

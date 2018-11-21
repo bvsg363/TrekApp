@@ -3,10 +3,9 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.gani.trekapp">
 
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.INTERNET" />
-
 
     <application
         android:allowBackup="true"
@@ -30,6 +29,7 @@
             android:theme="@style/AppTheme.NoActionBar" />
         <activity android:name=".TrekActivity" />
         <activity android:name=".NavigationActivity" />
+        <activity android:name=".PastTreks"></activity>
     </application>
 
 </manifest>

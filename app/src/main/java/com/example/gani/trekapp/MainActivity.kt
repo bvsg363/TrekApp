@@ -93,7 +93,7 @@ class MainActivity : AppCompatActivity() {
 
             if (response.getString("status") == "success"){
                 Toast.makeText(this, "Login Success!", Toast.LENGTH_SHORT).show()
-                saveSession(response.getInt("uid"), emailId, password, response.getString("user_name"))
+                saveSession(response.getInt("uid"), emailId, password, response.getString("name"))
                 clearFields()
                 doLogin()
             }
