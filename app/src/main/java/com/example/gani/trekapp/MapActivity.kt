@@ -12,15 +12,20 @@ import com.google.android.gms.maps.model.MarkerOptions
 
 class MapActivity : AppCompatActivity(), OnMapReadyCallback {
 
-    private lateinit var mMap: GoogleMap
+    private lateinit var map: GoogleMap
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_map)
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
+        //println("In the oncreate 1 **********")
         val mapFragment = supportFragmentManager
                 .findFragmentById(R.id.map) as SupportMapFragment
         mapFragment.getMapAsync(this)
+    }
+
+    private fun setUpMap(){
+
     }
 
     /**
@@ -33,11 +38,16 @@ class MapActivity : AppCompatActivity(), OnMapReadyCallback {
      * installed Google Play services and returned to the app.
      */
     override fun onMapReady(googleMap: GoogleMap) {
-        mMap = googleMap
+        //println("In the start of the onMapReady 1 *****")
+        map = googleMap
 
-        // Add a marker in Sydney and move the camera
-        val sydney = LatLng(-34.0, 151.0)
-        mMap.addMarker(MarkerOptions().position(sydney).title("Marker in Sydney"))
-        mMap.moveCamera(CameraUpdateFactory.newLatLng(sydney))
+        map.mapType = GoogleMap.MAP_TYPE_SATELLITE
+
+        // Add a marker in IITB and move the camera
+        val iitb = LatLng(19.1334, 72.9133)
+        map.addMarker(MarkerOptions().position(iitb).title("IITB"))
+        map.moveCamera(CameraUpdateFactory.newLatLngZoom(iitb, 12.0f))
+
+        setUpMap()
     }
 }
