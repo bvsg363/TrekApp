@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
@@ -56,10 +57,9 @@ class SignUpActivity : AppCompatActivity() {
 
             if (response.getString("status") == "success"){
 
-                Toast.makeText(this, "Registration Success!", Toast.LENGTH_SHORT).show()
-                saveSesion(response.getInt("uid"), emailId, password, username)
+//                Toast.makeText(this, "Registration Success!", Toast.LENGTH_SHORT).show()
                 clearFields()
-                doSignUp()
+                showAlert()
             }
             else{
                 Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
@@ -69,11 +69,9 @@ class SignUpActivity : AppCompatActivity() {
         }, Response.ErrorListener {
             progressBar2.visibility = View.INVISIBLE
             Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
-            clearFields()
         })
 
         requestQueue.add(jsonRequest)
-
     }
 
     private fun checkFeilds(){
@@ -85,6 +83,7 @@ class SignUpActivity : AppCompatActivity() {
         when {
             username.trim().isEmpty() -> Toast.makeText(this, "Username field is Empty!", Toast.LENGTH_SHORT).show()
             emailId.trim().isEmpty() -> Toast.makeText(this, "Email field is Empty!", Toast.LENGTH_SHORT).show()
+            !emailId.trim().contains("@") -> Toast.makeText(this, "Invalid Email", Toast.LENGTH_SHORT).show()
             password.trim().isEmpty() -> Toast.makeText(this, "Password field is Empty!", Toast.LENGTH_SHORT).show()
             password.trim().length < 5 -> Toast.makeText(this, "Enter Password between 5-20 characters", Toast.LENGTH_SHORT).show()
             password.trim().length > 20 -> Toast.makeText(this, "Enter Password between 5-20 characters", Toast.LENGTH_SHORT).show()
@@ -102,20 +101,16 @@ class SignUpActivity : AppCompatActivity() {
         editText6.text.clear()
     }
 
-    fun doSignUp(){
-        val signupIntent = Intent(this, HomeScreenActivity::class.java)
-        startActivity(signupIntent)
-        finishAffinity()
-    }
+    fun showAlert(){
 
-    fun saveSesion(uid : Int, emailId: String, password: String, username: String){
-        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
-        val sharedPrefEditor =  sharedPreferences.edit()
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Signup Verification")
 
-        sharedPrefEditor.putInt("uid", uid)
-        sharedPrefEditor.putString("email", emailId)
-        sharedPrefEditor.putString("password", password)
-        sharedPrefEditor.putString("username", username)
-        sharedPrefEditor.apply()
+        builder.setMessage("Please click on the verification link sent to given mail id to complete the Signup process ")
+        builder.setPositiveButton("OK"){_, _ ->
+            finish()
+        }
+        builder.setCancelable(false)
+        builder.create().show()
     }
 }

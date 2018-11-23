@@ -95,6 +95,7 @@ class MainActivity : AppCompatActivity() {
                 Toast.makeText(this, "Login Success!", Toast.LENGTH_SHORT).show()
                 saveSession(response.getInt("uid"), emailId, password, response.getString("name"))
                 clearFields()
+                getSharedPreferences("TrekApp", Context.MODE_PRIVATE).edit().putString("Login", "new").apply()
                 doLogin()
             }
             else{
@@ -111,9 +112,6 @@ class MainActivity : AppCompatActivity() {
         requestQueue.add(jsonRequest)
     }
 
-//    override fun onStop() {
-//        super.onStop()
-//    }
 
     fun saveSession(uid : Int, emailId: String, password: String, username : String){
         val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
