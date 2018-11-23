@@ -44,16 +44,19 @@
 
         <activity
             android:name=".MapActivity"
-            android:label="@string/title_activity_map">
-        </activity>
+            android:label="@string/title_activity_map"></activity>
         <activity android:name=".PastTreks" />
         <activity android:name=".mapBox">
-            <!--intent-filter>
+
+            <!--
+            intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
                 <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter-->
+            </intent-filter
+            -->
         </activity>
+        <activity android:name=".DownloadMap"></activity>
     </application>
 
 </manifest>

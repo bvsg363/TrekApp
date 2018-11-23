@@ -5,16 +5,31 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".mapBox">
+    tools:context=".DownloadMap">
 
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        mapbox:mapbox_cameraTargetLat="19.1334"
-        mapbox:mapbox_cameraTargetLng="72.9133"
+        mapbox:mapbox_cameraTargetLat="37.70"
+        mapbox:mapbox_cameraTargetLng="-119.60"
         mapbox:mapbox_styleUrl="mapbox://styles/mapbox/satellite-streets-v10"
         mapbox:mapbox_cameraTilt="60"
         mapbox:mapbox_cameraZoom="11"/>
+
+    <ProgressBar
+        android:id="@+id/progress_bar"
+        style="?android:attr/progressBarStyleHorizontal"
+        android:layout_width="match_parent"
+        android:layout_height="25dp"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        android:visibility="visible"
+        android:background="@color/colorPrimary"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+
 
 </android.support.constraint.ConstraintLayout>

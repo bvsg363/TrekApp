@@ -10,5 +10,5 @@
     <string name="first_name">First Name</string>
     <string name="title_activity_map">Map</string>
     <string name="google_maps_key">GetFromMessenger</string>
-    <string name="_access_token">XXXXXGETfromMessengerXXXX</string>
+    <string name="mapbox_access_token">GetFromMessenger</string>
 </resources>
