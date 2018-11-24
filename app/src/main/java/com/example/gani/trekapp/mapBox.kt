@@ -16,7 +16,7 @@ class mapBox : AppCompatActivity() {
         Mapbox.getInstance(applicationContext, getString(R.string.mapbox_access_token))
         setContentView(R.layout.activity_map_box)
 
-        mapView.onCreate(savedInstanceState)
+        mapView1.onCreate(savedInstanceState)
         //mapView.getMapAsync({
          //   it.setStyle(Style.SATELLITE)
         //})
@@ -24,36 +24,36 @@ class mapBox : AppCompatActivity() {
 
     override fun onResume(){
         super.onResume()
-        mapView.onResume()
+        mapView1.onResume()
     }
 
     override fun onStart() {
         super.onStart()
-        mapView.onStart()
+        mapView1.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView.onStop()
+        mapView1.onStop()
     }
 
     public override fun onPause() {
         super.onPause()
-        mapView.onPause()
+        mapView1.onPause()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView.onLowMemory()
+        mapView1.onLowMemory()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mapView.onDestroy()
+        mapView1.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mapView.onSaveInstanceState(outState)
+        mapView1.onSaveInstanceState(outState)
     }
 }

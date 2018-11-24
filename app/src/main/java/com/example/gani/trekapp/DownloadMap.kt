@@ -12,16 +12,14 @@ import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.geometry.LatLng
 import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
-import com.mapbox.mapboxsdk.maps.MapboxMap
-import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
 import com.mapbox.mapboxsdk.offline.OfflineManager
 import com.mapbox.mapboxsdk.offline.OfflineRegion
 import com.mapbox.mapboxsdk.offline.OfflineRegionError
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
+import kotlinx.android.synthetic.main.activity_download_map.*
 
 import org.json.JSONObject
-import timber.log.Timber
 
 /**
  * Download and view an offline map using the Mapbox Android SDK.
@@ -30,8 +28,10 @@ class DownloadMap : AppCompatActivity() {
 
     private var isEndNotified: Boolean = false
     private var progressBar: ProgressBar? = null
-    private var mapView: MapView? = null
+//    private var mapView: MapView? = null
     private var offlineManager: OfflineManager? = null
+
+    var down_size = 0
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -43,20 +43,32 @@ class DownloadMap : AppCompatActivity() {
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_download_map)
 
-        mapView = findViewById<View>(R.id.mapView) as MapView
-        mapView!!.onCreate(savedInstanceState)
-        mapView!!.getMapAsync { mapboxMap ->
-        //     Set up the OfflineManager
-            offlineManager = OfflineManager.getInstance(this)
+        offlineManager = OfflineManager.getInstance(this)
 
+
+        mapView!!.onCreate(savedInstanceState)
+
+
+        delete_button.setOnClickListener {
+            deleteMap()
+        }
+
+        download_button.setOnClickListener {
+            download_map()
+        }
+    }
+
+    fun download_map(){
+
+//        mapView = findViewById<View>(R.id.mapView) as MapView
+        mapView!!.getMapAsync { mapboxMap ->
+            //     Set up the OfflineManager
             // Create a bounding box for the offline region
             val latLngBounds = LatLngBounds.Builder()
-                    //.include(LatLng(37.7897, -119.5073)) // Northeast
-                    //.include(LatLng(37.6744, -119.6815)) // Southwest
-                    .include(LatLng(19.13, 72.96)) // Northeast
-                    .include(LatLng(19.08, 72.86)) // Southwest
-                    //.include(LatLng(23.36, 85.335)) // Northeast
-                    //.include(LatLng(23.31, 85.284)) // Southwest
+//                    .include(LatLng(19.148767, 72.922127))
+//                    .include(LatLng(19.137560, 72.914507))
+                    .include(LatLng(19.140962, 73.090414))
+                    .include(LatLng(19.019297, 73.006122 ))
                     .build()
 
             // Define the offline region
@@ -77,7 +89,7 @@ class DownloadMap : AppCompatActivity() {
                 val json = jsonObject.toString()
                 metadata = json.toByteArray(charset(JSON_CHARSET))
             } catch (exception: Exception) {
-                Timber.e("Failed to encode metadata: %s", exception.message)
+                Log.e(TAG, "Failed to encode metadata: " + exception.message)
                 metadata = null
             }
 
@@ -104,6 +116,9 @@ class DownloadMap : AppCompatActivity() {
                                         0.0
 
                                     if (status.isComplete) {
+
+                                        Log.i("DownloadMap", status.requiredResourceCount.toString())
+
                                         // Download complete
                                         endProgress("Success")
                                     } else if (status.isRequiredResourceCountPrecise) {
@@ -114,8 +129,8 @@ class DownloadMap : AppCompatActivity() {
 
                                 override fun onError(error: OfflineRegionError) {
                                     // If an error occurs, print to logcat
-                                    Timber.e("onError reason: %s", error.reason)
-                                    Timber.e( "onError message: %s", error.message)
+                                    Log.e(TAG, "onError reason: " + error.reason)
+                                    Log.e(TAG, "onError message: " + error.message)
                                 }
 
                                 override fun mapboxTileCountLimitExceeded(limit: Long) {
@@ -124,7 +139,7 @@ class DownloadMap : AppCompatActivity() {
                                 }
                             })
 
-//                            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+                            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
 
                         }
 
@@ -153,33 +168,6 @@ class DownloadMap : AppCompatActivity() {
     public override fun onPause() {
         super.onPause()
         mapView!!.onPause()
-        if (offlineManager != null) {
-            offlineManager!!.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
-                override fun onList(offlineRegions: Array<OfflineRegion>) {
-                    if (offlineRegions.size > 0) {
-                        // delete the last item in the offlineRegions list which will be yosemite offline map
-                        offlineRegions[offlineRegions.size - 1].delete(object : OfflineRegion.OfflineRegionDeleteCallback {
-                            override fun onDelete() {
-                                Toast.makeText(
-                                        this@DownloadMap,
-                                        "Offline deleted",
-                                        Toast.LENGTH_LONG
-                                ).show()
-
-                            }
-
-                            override fun onError(error: String) {
-                                Log.e(TAG, "On Delete error: $error")
-                            }
-                        })
-                    }
-                }
-
-                override fun onError(error: String) {
-                    Log.e(TAG, "onListError: $error")
-                }
-            })
-        }
     }
 
     override fun onLowMemory() {
@@ -190,6 +178,7 @@ class DownloadMap : AppCompatActivity() {
     override fun onDestroy() {
         super.onDestroy()
         mapView!!.onDestroy()
+//        deleteMap()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -236,5 +225,41 @@ class DownloadMap : AppCompatActivity() {
         val JSON_CHARSET = "UTF-8"
         val JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME"
     }
-}
 
+    fun deleteMap(){
+
+        if (offlineManager != null) {
+            offlineManager!!.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+                override fun onList(offlineRegions: Array<OfflineRegion>) {
+
+                    Log.i("DownloadMap1", offlineRegions.size.toString())
+
+                    if (offlineRegions.size > 0) {
+                        // delete the last item in the offlineRegions list which will be yosemite offline map
+
+//                        Log.d("DownloadMap ",  offlineRegions[offlineRegions.size - 1])
+
+                        offlineRegions[offlineRegions.size - 1].delete(object : OfflineRegion.OfflineRegionDeleteCallback {
+                            override fun onDelete() {
+                                Toast.makeText(
+                                        this@DownloadMap,
+                                        "Offline deleted",
+                                        Toast.LENGTH_LONG
+                                ).show()
+//                                Log.i("DownloadMap2", offlineRegions.size.toString())
+                            }
+
+                            override fun onError(error: String) {
+                                Log.e(TAG, "On Delete error: $error")
+                            }
+                        })
+                    }
+                }
+
+                override fun onError(error: String) {
+                    Log.e(TAG, "onListError: $error")
+                }
+            })
+        }
+    }
+}
