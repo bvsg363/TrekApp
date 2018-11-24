@@ -28,7 +28,7 @@ class TreksListAdapter(val items : ArrayList<Pair<Int, String>>, val context: Co
 
         init {
             view.setOnClickListener {
-                onItemClick?.invoke(items[adapterPosition].second)
+                onItemClick?.invoke(items[adapterPosition].first.toString())
             }
         }
 

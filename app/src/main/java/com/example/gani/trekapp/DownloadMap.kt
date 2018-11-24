@@ -1,11 +1,17 @@
 package com.example.gani.trekapp
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 
 //import com.mapbox.mapboxandroiddemo.R
 import com.mapbox.mapboxsdk.Mapbox
@@ -19,6 +25,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegion
 import com.mapbox.mapboxsdk.offline.OfflineRegionError
 import com.mapbox.mapboxsdk.offline.OfflineRegionStatus
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
+import kotlinx.android.synthetic.main.activity_download_map.*
 
 import org.json.JSONObject
 
@@ -28,12 +35,15 @@ import org.json.JSONObject
 class DownloadMap : AppCompatActivity() {
 
     private var isEndNotified: Boolean = false
+    private var trekName: String? = null
+    private var trekId: String? = null
     private var progressBar: ProgressBar? = null
-    private var mapView: MapView? = null
+//    private var mapView: MapView? = null
     private var offlineManager: OfflineManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        trekId = intent.getStringExtra("trekName")          // At present sending the id as a string
 
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
@@ -42,12 +52,24 @@ class DownloadMap : AppCompatActivity() {
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_download_map)
 
-        mapView = findViewById<View>(R.id.mapView) as MapView
-        mapView!!.onCreate(savedInstanceState)
-        mapView!!.getMapAsync { mapboxMap ->
-        //     Set up the OfflineManager
-            offlineManager = OfflineManager.getInstance(this)
+        start_button.setOnClickListener {
 
+            //if (!sharedPreferences.contains("treksAvailable")) {
+            //    Toast.makeText(this, "trekNames not available", Toast.LENGTH_SHORT).show()
+            //}
+            //val trekList = JSONObject(sharedPreferences.getString("treksAvailable", ""))
+            val mapStartIntent = Intent(this, mapBox::class.java)
+            startActivity(mapStartIntent)
+            getTrekData()
+
+        }
+//        mapView = findViewById<View>(R.id.mapView) as MapView
+//        mapView!!.onCreate(savedInstanceState)
+//        mapView!!.getMapAsync { mapboxMap ->
+        //     Set up the OfflineManager
+        offlineManager = OfflineManager.getInstance(this)
+
+        download_button.setOnClickListener {
             // Create a bounding box for the offline region
             val latLngBounds = LatLngBounds.Builder()
                     //.include(LatLng(37.7897, -119.5073)) // Northeast
@@ -59,10 +81,11 @@ class DownloadMap : AppCompatActivity() {
                     .build()
 
             // Define the offline region
-            Toast.makeText(this, mapboxMap.styleUrl, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, mapboxMap.styleUrl, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "mapbox://styles/mapbox/streets-v10", Toast.LENGTH_SHORT).show()
             val definition = OfflineTilePyramidRegionDefinition(
-                    mapboxMap.styleUrl,
-//                    "mapbox://styles/mapbox/streets-v10",
+//                    mapboxMap.styleUrl,
+                    "mapbox://styles/mapbox/streets-v10",
                     latLngBounds,
                     10.0,
                     20.0,
@@ -81,6 +104,7 @@ class DownloadMap : AppCompatActivity() {
             }
 
             // Create the region asynchronously
+
             offlineManager!!.createOfflineRegion(
                     definition,
                     metadata!!,
@@ -130,10 +154,67 @@ class DownloadMap : AppCompatActivity() {
                         override fun onError(error: String) {
                             Log.e(TAG, "Error: $error")
                         }
-                    })
+                    }
+            )
+
         }
+
     }
 
+    private fun getTrekData():Boolean{
+        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+        val uid = sharedPreferences.getInt("uid", 0)
+        val url = GlobalVariables().trekDataUrl
+        val requestQueue = Volley.newRequestQueue(this)
+        val finalUrl = "$url?uid=$uid&trek_id=$trekId"
+/*
+        val jsonRequest = JsonObjectRequest(Request.Method.GET, url, null, Response.Listener<JSONObject>{ response ->
+
+            print(response)
+            Log.i("TrekData", response.getString("status"))
+
+            if (response.getString("status") == "true"){
+//                Toast.makeText(this, "Success getting treks", Toast.LENGTH_SHORT).show()
+                saveTrekData(response)
+                val mapStartIntent = Intent(this, mapBox::class.java)
+                startActivity(mapStartIntent)
+//                    displayTreks(response)
+            }
+            else{
+
+                val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+
+//                Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
+                if (sharedPreferences.contains("treksAvailable")){
+                    val mapStartIntent = Intent(this, mapBox::class.java)
+                    startActivity(mapStartIntent)
+//                        displayTreks(JSONObject(sharedPreferences.getString("treksAvailable", "")))
+                }
+
+                Toast.makeText(this, "Error in database", Toast.LENGTH_SHORT).show()
+            }
+
+        }, Response.ErrorListener {
+            val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+
+            Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
+
+            if (sharedPreferences.contains("treksAvailable")) {
+                //displayTreks(JSONObject(sharedPreferences.getString("treksAvailable", "")))
+                val mapStartIntent = Intent(this, mapBox::class.java)
+                startActivity(mapStartIntent)
+            }
+        })
+
+        requestQueue.add(jsonRequest)
+        */
+        return true;
+    }
+
+    private fun saveTrekData() {
+
+    }
+/*
     public override fun onResume() {
         super.onResume()
         mapView!!.onResume()
@@ -147,11 +228,11 @@ class DownloadMap : AppCompatActivity() {
     override fun onStop() {
         super.onStop()
         mapView!!.onStop()
-    }
+    }*/
 
     public override fun onPause() {
         super.onPause()
-        mapView!!.onPause()
+//        mapView!!.onPause()
         if (offlineManager != null) {
             offlineManager!!.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
                 override fun onList(offlineRegions: Array<OfflineRegion>) {
@@ -180,7 +261,7 @@ class DownloadMap : AppCompatActivity() {
             })
         }
     }
-
+/*
     override fun onLowMemory() {
         super.onLowMemory()
         mapView!!.onLowMemory()
@@ -194,7 +275,7 @@ class DownloadMap : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mapView!!.onSaveInstanceState(outState)
-    }
+    }*/
 
     // Progress bar methods
     private fun startProgress() {

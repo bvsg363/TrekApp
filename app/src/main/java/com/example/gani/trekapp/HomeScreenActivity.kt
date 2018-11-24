@@ -68,6 +68,7 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
             //val intent = Intent(this, MapActivity::class.java)
             //val intent = Intent(this, mapBox::class.java)
             val intent = Intent(this, DownloadMap::class.java)
+            intent.putExtra("trekName", str)
             startActivity(intent)
         }
 
@@ -244,7 +245,9 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         (recycler_view.adapter as TreksListAdapter).onItemClick = {
             str ->
-            val intent = Intent(this, TrekActivity::class.java)
+            //val intent = Intent(this, TrekActivity::class.java)
+            //intent.putExtra("trekName", str)
+            val intent = Intent(this, DownloadMap::class.java)
             intent.putExtra("trekName", str)
             startActivity(intent)
         }
