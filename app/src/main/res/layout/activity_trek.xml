@@ -80,7 +80,7 @@
         android:id="@+id/imageView"
         android:layout_width="0dp"
         android:layout_height="375dp"
-        android:src="@drawable/trek"
+        android:src="@drawable/hi"
         app:layout_constraintBottom_toTopOf="@+id/get_location"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.414"

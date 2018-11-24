@@ -242,8 +242,7 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
             //val intent = Intent(this, TrekActivity::class.java)
             //intent.putExtra("trekName", str)
-            val intent = Intent(this, DownloadMap::class.java)
-            intent.putExtra("trekName", str)
+            intent.putExtra("trekId", str)
             startActivity(intent)
         }
     }
