@@ -11,14 +11,17 @@
         <item
             android:id="@+id/nav_past_treks"
             android:title="Past Treks"
+            android:checkable="true"
             />
         <item
             android:id="@+id/nav_offline_treks"
             android:title="Offline Treks"
+            android:checkable="true"
             />
         <item
             android:id="@+id/nav_logout"
             android:title="Logout"
+            android:checkable="true"
             />
     </group>
 
