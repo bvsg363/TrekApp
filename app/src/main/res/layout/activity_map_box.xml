@@ -17,8 +17,8 @@
         app:layout_constraintTop_toTopOf="parent"
         mapbox:mapbox_cameraTargetLat="19.1334"
         mapbox:mapbox_cameraTargetLng="72.9133"
+        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"
         mapbox:mapbox_cameraTilt="60"
-        mapbox:mapbox_cameraZoom="11"
-        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/satellite-streets-v10" />
+        mapbox:mapbox_cameraZoom="11"/>
 
 </android.support.constraint.ConstraintLayout>

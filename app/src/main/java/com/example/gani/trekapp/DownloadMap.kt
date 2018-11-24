@@ -1,11 +1,17 @@
 package com.example.gani.trekapp
 
+import android.content.Context
+import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
 import android.widget.Toast
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 
 //import com.mapbox.mapboxandroiddemo.R
 import com.mapbox.mapboxsdk.Mapbox
@@ -20,6 +26,7 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
 import kotlinx.android.synthetic.main.activity_download_map.*
 
 import org.json.JSONObject
+import java.io.File
 
 /**
  * Download and view an offline map using the Mapbox Android SDK.
@@ -27,6 +34,9 @@ import org.json.JSONObject
 class DownloadMap : AppCompatActivity() {
 
     private var isEndNotified: Boolean = false
+    private var trekName: String? = null
+    private var fileName: String? = null
+    private var trekId: String? = null
     private var progressBar: ProgressBar? = null
 //    private var mapView: MapView? = null
     private var offlineManager: OfflineManager? = null
@@ -35,6 +45,9 @@ class DownloadMap : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        trekId = intent.getStringExtra("trekName")          // At present sending the id as a string
+        fileName = "${filesDir}/trekData_$trekId"
+
 
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
@@ -42,6 +55,7 @@ class DownloadMap : AppCompatActivity() {
 
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_download_map)
+        imageView.setImageResource(R.drawable.hi)
 
         offlineManager = OfflineManager.getInstance(this)
 
@@ -63,6 +77,27 @@ class DownloadMap : AppCompatActivity() {
 //        mapView = findViewById<View>(R.id.mapView) as MapView
         mapView!!.getMapAsync { mapboxMap ->
             //     Set up the OfflineManager
+        var file = File(fileName)
+        if(!file.exists()){
+            start_button.visibility = View.INVISIBLE
+        }
+        start_button.setOnClickListener {
+
+            //if (!sharedPreferences.contains("treksAvailable")) {
+            //    Toast.makeText(this, "trekNames not available", Toast.LENGTH_SHORT).show()
+            //}
+            //val trekList = JSONObject(sharedPreferences.getString("treksAvailable", ""))
+            val mapStartIntent = Intent(this, mapBox::class.java)
+            startActivity(mapStartIntent)
+            getTrekData(true)
+        }
+//        mapView = findViewById<View>(R.id.mapView) as MapView
+//        mapView!!.onCreate(savedInstanceState)
+//        mapView!!.getMapAsync { mapboxMap ->
+        //     Set up the OfflineManager
+        offlineManager = OfflineManager.getInstance(this)
+
+        download_button.setOnClickListener {
             // Create a bounding box for the offline region
             val latLngBounds = LatLngBounds.Builder()
 //                    .include(LatLng(19.148767, 72.922127))
@@ -72,10 +107,11 @@ class DownloadMap : AppCompatActivity() {
                     .build()
 
             // Define the offline region
-            Toast.makeText(this, mapboxMap.styleUrl, Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, mapboxMap.styleUrl, Toast.LENGTH_SHORT).show()
+            Toast.makeText(this, "mapbox://styles/mapbox/streets-v10", Toast.LENGTH_SHORT).show()
             val definition = OfflineTilePyramidRegionDefinition(
-                    mapboxMap.styleUrl,
-//                    "mapbox://styles/mapbox/streets-v10",
+//                    mapboxMap.styleUrl,
+                    "mapbox://styles/mapbox/streets-v10",
                     latLngBounds,
                     10.0,
                     20.0,
@@ -94,6 +130,7 @@ class DownloadMap : AppCompatActivity() {
             }
 
             // Create the region asynchronously
+
             offlineManager!!.createOfflineRegion(
                     definition,
                     metadata!!,
@@ -121,6 +158,7 @@ class DownloadMap : AppCompatActivity() {
 
                                         // Download complete
                                         endProgress("Success")
+                                        getTrekData(false)
                                     } else if (status.isRequiredResourceCountPrecise) {
                                         // Switch to determinate state
                                         setPercentage(Math.round(percentage).toInt())
@@ -146,44 +184,76 @@ class DownloadMap : AppCompatActivity() {
                         override fun onError(error: String) {
                             Log.e(TAG, "Error: $error")
                         }
-                    })
+                    }
+            )
+
         }
+
     }
 
-    public override fun onResume() {
-        super.onResume()
-        mapView!!.onResume()
+    private fun getTrekData(gotoMapFlag: Boolean):Boolean{
+        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+        //val uid = sharedPreferences.getInt("uid", 0)
+        val url = GlobalVariables().trekDataUrl
+        val requestQueue = Volley.newRequestQueue(this)
+        val finalUrl = "$url?trek_id=$trekId"
+
+        val jsonRequest = JsonObjectRequest(Request.Method.GET, finalUrl, null, Response.Listener<JSONObject>{ response ->
+
+            print(response)
+            Log.i("TrekData", response.getString("status"))
+
+            if (response.getString("status") == "success"){
+//                Toast.makeText(this, "Success getting treks", Toast.LENGTH_SHORT).show()
+                saveTrekData(response)
+                if(gotoMapFlag){
+                    val mapStartIntent = Intent(this, mapBox::class.java)
+                    startActivity(mapStartIntent)
+                }
+                else{
+                    start_button.visibility = View.VISIBLE
+                }
+//                    displayTreks(response)
+            }
+            else{
+
+//                Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(this, "Error in database", Toast.LENGTH_SHORT).show()
+                if(gotoMapFlag){
+                    val mapStartIntent = Intent(this, mapBox::class.java)
+                    startActivity(mapStartIntent)
+                }
+            }
+
+        }, Response.ErrorListener {
+            //val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+
+            Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
+            if(gotoMapFlag){
+                val mapStartIntent = Intent(this, mapBox::class.java)
+                startActivity(mapStartIntent)
+            }
+
+            //if (sharedPreferences.contains("treksAvailable")) {
+                //displayTreks(JSONObject(sharedPreferences.getString("treksAvailable", "")))
+
+            //}
+        })
+
+        requestQueue.add(jsonRequest)
+
+        return true;
     }
 
-    override fun onStart() {
-        super.onStart()
-        mapView!!.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mapView!!.onStop()
+    private fun saveTrekData(response: JSONObject) {
+        var file = File(fileName)
+        file.writeText(response.toString())
     }
 
     public override fun onPause() {
         super.onPause()
         mapView!!.onPause()
-    }
-
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView!!.onLowMemory()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView!!.onDestroy()
-//        deleteMap()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView!!.onSaveInstanceState(outState)
     }
 
     // Progress bar methods

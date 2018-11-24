@@ -8,7 +8,7 @@
     tools:context=".DownloadMap">
 
     <Button
-        android:id="@+id/download_button"
+        android:id="@+id/download_button_gani"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
@@ -29,7 +29,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
-    <com.mapbox.mapboxsdk.maps.MapView
+    <!-- <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView"
         android:layout_width="match_parent"
         android:layout_height="0dp"
@@ -37,13 +37,12 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/progress_bar"
+        app:layout_constraintVertical_bias="0.0"
         mapbox:mapbox_cameraTargetLat="19.10"
         mapbox:mapbox_cameraTargetLng="72.91"
         mapbox:mapbox_cameraTilt="60"
         mapbox:mapbox_cameraZoom="15"
-        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10" >
-
-    </com.mapbox.mapboxsdk.maps.MapView>
+        mapbox:mapbox_styleUrl="mapbox://styles/mapbox/streets-v10"></com.mapbox.mapboxsdk.maps.MapView-->
     <!--mapbox:mapbox_styleUrl="mapbox://styles/mapbox/satellite-streets-v10"
         mapbox:mapbox_cameraTargetLat="37.70"
         mapbox:mapbox_cameraTargetLng="-119.60"
@@ -64,6 +63,37 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/download_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginStart="8dp"
+        android:text="Download"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+    <Button
+        android:id="@+id/start_button"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:text="Start"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/progress_bar"/>
+        <!--mapbox:srcCompat="@drawable/common_google_signin_btn_icon_dark_focused" /-->
 
 
 </android.support.constraint.ConstraintLayout>

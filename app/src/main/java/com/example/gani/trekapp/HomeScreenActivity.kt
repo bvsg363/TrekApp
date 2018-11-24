@@ -240,6 +240,9 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 //            searchView?.onActionViewCollapsed()
 
 
+            //val intent = Intent(this, TrekActivity::class.java)
+            //intent.putExtra("trekName", str)
+            val intent = Intent(this, DownloadMap::class.java)
             intent.putExtra("trekName", str)
             startActivity(intent)
         }
