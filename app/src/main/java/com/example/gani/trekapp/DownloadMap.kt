@@ -21,6 +21,7 @@ import com.mapbox.mapboxsdk.offline.OfflineRegionStatus
 import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
 
 import org.json.JSONObject
+import timber.log.Timber
 
 /**
  * Download and view an offline map using the Mapbox Android SDK.
@@ -71,7 +72,7 @@ class DownloadMap : AppCompatActivity() {
                 val json = jsonObject.toString()
                 metadata = json.toByteArray(charset(JSON_CHARSET))
             } catch (exception: Exception) {
-                Log.e(TAG, "Failed to encode metadata: " + exception.message)
+                Timber.e("Failed to encode metadata: %s", exception.message)
                 metadata = null
             }
 
@@ -108,8 +109,8 @@ class DownloadMap : AppCompatActivity() {
 
                                 override fun onError(error: OfflineRegionError) {
                                     // If an error occurs, print to logcat
-                                    Log.e(TAG, "onError reason: " + error.reason)
-                                    Log.e(TAG, "onError message: " + error.message)
+                                    Timber.e("onError reason: %s", error.reason)
+                                    Timber.e( "onError message: %s", error.message)
                                 }
 
                                 override fun mapboxTileCountLimitExceeded(limit: Long) {
@@ -118,7 +119,7 @@ class DownloadMap : AppCompatActivity() {
                                 }
                             })
 
-                            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+//                            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
 
                         }
 
