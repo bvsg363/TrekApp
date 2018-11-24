@@ -50,14 +50,19 @@ class DownloadMap : AppCompatActivity() {
 
             // Create a bounding box for the offline region
             val latLngBounds = LatLngBounds.Builder()
-                    .include(LatLng(37.7897, -119.5073)) // Northeast
-                    .include(LatLng(37.6744, -119.6815)) // Southwest
+                    //.include(LatLng(37.7897, -119.5073)) // Northeast
+                    //.include(LatLng(37.6744, -119.6815)) // Southwest
+                    .include(LatLng(19.13, 72.96)) // Northeast
+                    .include(LatLng(19.08, 72.86)) // Southwest
+                    //.include(LatLng(23.36, 85.335)) // Northeast
+                    //.include(LatLng(23.31, 85.284)) // Southwest
                     .build()
 
             // Define the offline region
+            Toast.makeText(this, mapboxMap.styleUrl, Toast.LENGTH_SHORT).show()
             val definition = OfflineTilePyramidRegionDefinition(
-//                    mapboxMap.styleUrl,
-                    "mapbox://styles/mapbox/satellite-streets-v10",
+                    mapboxMap.styleUrl,
+//                    "mapbox://styles/mapbox/streets-v10",
                     latLngBounds,
                     10.0,
                     20.0,
@@ -196,14 +201,14 @@ class DownloadMap : AppCompatActivity() {
 
         // Start and show the progress bar
         isEndNotified = false
-//        progressBar!!.isIndeterminate = true
-//        progressBar!!.visibility = View.VISIBLE
-        progressBar!!.progress = 25
+        progressBar!!.isIndeterminate = true
+        progressBar!!.visibility = View.VISIBLE
+//        progressBar!!.progress = 25
     }
 
     private fun setPercentage(percentage: Int) {
-//        progressBar!!.isIndeterminate = false
-        progressBar!!.progress = percentage+50
+        progressBar!!.isIndeterminate = false
+        progressBar!!.progress = percentage
     }
 
     private fun endProgress(message: String) {
@@ -215,8 +220,8 @@ class DownloadMap : AppCompatActivity() {
         // Stop and hide the progress bar
         isEndNotified = true
 //        progressBar!!.isIndeterminate = false
-        progressBar!!.progress = 75
-//        progressBar!!.visibility = View.GONE
+//        progressBar!!.progress = 75
+        progressBar!!.visibility = View.GONE
 
         // Show a toast
         Toast.makeText(this, message, Toast.LENGTH_LONG).show()
