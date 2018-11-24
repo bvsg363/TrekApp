@@ -28,6 +28,7 @@ import com.mapbox.mapboxsdk.offline.OfflineTilePyramidRegionDefinition
 import kotlinx.android.synthetic.main.activity_download_map.*
 
 import org.json.JSONObject
+import java.io.File
 
 /**
  * Download and view an offline map using the Mapbox Android SDK.
@@ -36,6 +37,7 @@ class DownloadMap : AppCompatActivity() {
 
     private var isEndNotified: Boolean = false
     private var trekName: String? = null
+    private var fileName: String? = null
     private var trekId: String? = null
     private var progressBar: ProgressBar? = null
 //    private var mapView: MapView? = null
@@ -44,6 +46,8 @@ class DownloadMap : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         trekId = intent.getStringExtra("trekName")          // At present sending the id as a string
+        fileName = "${filesDir}/trekData_$trekId"
+
 
         // Mapbox access token is configured here. This needs to be called either in your application
         // object or in the same activity which contains the mapview.
@@ -51,7 +55,12 @@ class DownloadMap : AppCompatActivity() {
 
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_download_map)
+        imageView.setImageResource(R.drawable.hi)
 
+        var file = File(fileName)
+        if(!file.exists()){
+            start_button.visibility = View.INVISIBLE
+        }
         start_button.setOnClickListener {
 
             //if (!sharedPreferences.contains("treksAvailable")) {
@@ -60,8 +69,7 @@ class DownloadMap : AppCompatActivity() {
             //val trekList = JSONObject(sharedPreferences.getString("treksAvailable", ""))
             val mapStartIntent = Intent(this, mapBox::class.java)
             startActivity(mapStartIntent)
-            getTrekData()
-
+            getTrekData(true)
         }
 //        mapView = findViewById<View>(R.id.mapView) as MapView
 //        mapView!!.onCreate(savedInstanceState)
@@ -129,6 +137,7 @@ class DownloadMap : AppCompatActivity() {
                                     if (status.isComplete) {
                                         // Download complete
                                         endProgress("Success")
+                                        getTrekData(false)
                                     } else if (status.isRequiredResourceCountPrecise) {
                                         // Switch to determinate state
                                         setPercentage(Math.round(percentage).toInt())
@@ -161,74 +170,65 @@ class DownloadMap : AppCompatActivity() {
 
     }
 
-    private fun getTrekData():Boolean{
+    private fun getTrekData(gotoMapFlag: Boolean):Boolean{
         val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
-        val uid = sharedPreferences.getInt("uid", 0)
+        //val uid = sharedPreferences.getInt("uid", 0)
         val url = GlobalVariables().trekDataUrl
         val requestQueue = Volley.newRequestQueue(this)
-        val finalUrl = "$url?uid=$uid&trek_id=$trekId"
-/*
-        val jsonRequest = JsonObjectRequest(Request.Method.GET, url, null, Response.Listener<JSONObject>{ response ->
+        val finalUrl = "$url?trek_id=$trekId"
+
+        val jsonRequest = JsonObjectRequest(Request.Method.GET, finalUrl, null, Response.Listener<JSONObject>{ response ->
 
             print(response)
             Log.i("TrekData", response.getString("status"))
 
-            if (response.getString("status") == "true"){
+            if (response.getString("status") == "success"){
 //                Toast.makeText(this, "Success getting treks", Toast.LENGTH_SHORT).show()
                 saveTrekData(response)
-                val mapStartIntent = Intent(this, mapBox::class.java)
-                startActivity(mapStartIntent)
+                if(gotoMapFlag){
+                    val mapStartIntent = Intent(this, mapBox::class.java)
+                    startActivity(mapStartIntent)
+                }
+                else{
+                    start_button.visibility = View.VISIBLE
+                }
 //                    displayTreks(response)
             }
             else{
 
-                val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
-
 //                Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
-                if (sharedPreferences.contains("treksAvailable")){
-                    val mapStartIntent = Intent(this, mapBox::class.java)
-                    startActivity(mapStartIntent)
-//                        displayTreks(JSONObject(sharedPreferences.getString("treksAvailable", "")))
-                }
 
                 Toast.makeText(this, "Error in database", Toast.LENGTH_SHORT).show()
+                if(gotoMapFlag){
+                    val mapStartIntent = Intent(this, mapBox::class.java)
+                    startActivity(mapStartIntent)
+                }
             }
 
         }, Response.ErrorListener {
-            val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+            //val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
 
             Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
-
-            if (sharedPreferences.contains("treksAvailable")) {
-                //displayTreks(JSONObject(sharedPreferences.getString("treksAvailable", "")))
+            if(gotoMapFlag){
                 val mapStartIntent = Intent(this, mapBox::class.java)
                 startActivity(mapStartIntent)
             }
+
+            //if (sharedPreferences.contains("treksAvailable")) {
+                //displayTreks(JSONObject(sharedPreferences.getString("treksAvailable", "")))
+
+            //}
         })
 
         requestQueue.add(jsonRequest)
-        */
+
         return true;
     }
 
-    private fun saveTrekData() {
-
+    private fun saveTrekData(response: JSONObject) {
+        var file = File(fileName)
+        file.writeText(response.toString())
     }
-/*
-    public override fun onResume() {
-        super.onResume()
-        mapView!!.onResume()
-    }
-
-    override fun onStart() {
-        super.onStart()
-        mapView!!.onStart()
-    }
-
-    override fun onStop() {
-        super.onStop()
-        mapView!!.onStop()
-    }*/
 
     public override fun onPause() {
         super.onPause()
@@ -261,21 +261,6 @@ class DownloadMap : AppCompatActivity() {
             })
         }
     }
-/*
-    override fun onLowMemory() {
-        super.onLowMemory()
-        mapView!!.onLowMemory()
-    }
-
-    override fun onDestroy() {
-        super.onDestroy()
-        mapView!!.onDestroy()
-    }
-
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-        mapView!!.onSaveInstanceState(outState)
-    }*/
 
     // Progress bar methods
     private fun startProgress() {

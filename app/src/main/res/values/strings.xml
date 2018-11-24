@@ -10,5 +10,5 @@
     <string name="first_name">First Name</string>
     <string name="title_activity_map">Map</string>
     <string name="google_maps_key">GetFromMessenger</string>
-    <string name="mapbox_access_token">SeeMessenger</string>
+    <string name="mapbox_access_token">pk.eyJ1IjoicnN1ZGFyc2FuYW4iLCJhIjoiY2pvc2FyMjFpMGttNDNzbWxnb2x2a2h3ayJ9.ffH8obP_OazhklCovEi14w</string>
 </resources>
