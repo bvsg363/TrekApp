@@ -1,23 +1,69 @@
 package com.example.gani.trekapp
 
-import android.content.Intent
 import android.Manifest
+import android.content.Intent
 import android.content.IntentSender
-import android.support.v7.app.AppCompatActivity
-import android.os.Bundle
-import kotlinx.android.synthetic.main.activity_trek.*
-import android.widget.Toast
 import android.content.pm.PackageManager
 import android.location.Location
+import android.support.v7.app.AppCompatActivity
+import android.os.Bundle
 import android.support.v4.app.ActivityCompat
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.widget.Toast
 import com.google.android.gms.common.api.ResolvableApiException
 import com.google.android.gms.location.*
 import com.google.android.gms.tasks.Task
+import kotlinx.android.synthetic.main.activity_trek.*
+
+//import com.mapbox.android.core.location.LocationEngineListener
+//import com.mapbox.android.core.location.LocationEngineProvider
+//import com.mapbox.android.core.permissions.PermissionsManager
+//import com.mapbox.api.directions.v5.models.DirectionsResponse
+//import com.mapbox.geojson.Point
+//import com.mapbox.mapboxsdk.Mapbox
+//import com.mapbox.services.android.navigation.v5.navigation.MapboxNavigation
+//import com.mapbox.services.android.navigation.v5.navigation.NavigationRoute
+//import retrofit2.Call
+//import retrofit2.Callback
+//import retrofit2.Response
 
 
 class TrekActivity : AppCompatActivity() {
+
+//    private var permissionsManager: PermissionsManager? = null
+//
+//    private var locationEngineListener: LocationEngineListener? = null
+
+//    override fun onCreate(savedInstanceState: Bundle?) {
+//        super.onCreate(savedInstanceState)
+//        val navigation = MapboxNavigation(this, getString(R.string.mapbox_access_token))
+//
+//        val origin = Point.fromLngLat(-77.03613, 38.90992)
+//        val destination = Point.fromLngLat(-77.0365, 38.8977)
+//
+//        val locationEngine = LocationEngineProvider(this).obtainBestLocationEngineAvailable()
+//        navigation.locationEngine = locationEngine
+//        locationEngine.activate()
+//        locationEngine.addLocationEngineListener(this.locationEngineListener)
+//
+//        NavigationRoute.builder(this)
+//                .accessToken(Mapbox.getAccessToken()!!)
+//                .origin(origin)
+//                .destination(destination)
+//                .build()
+//                .getRoute(object : Callback<DirectionsResponse> {
+//                    override fun onResponse(call: Call<DirectionsResponse>, response: Response<DirectionsResponse>) {
+//                        Toast.makeText(this@TrekActivity, "Inside NavigationRoute", Toast.LENGTH_LONG).show()
+//                    }
+//
+//                    override fun onFailure(call: Call<DirectionsResponse>, t: Throwable) {
+//
+//                    }
+//                })
+//    }
+
+
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private val myPermissions = 0
     private val requestUpdate = "1"
@@ -48,22 +94,13 @@ class TrekActivity : AppCompatActivity() {
                     != PackageManager.PERMISSION_GRANTED) {
                 Log.d("print", "permission not granted")
                 requestingLocationUpdates = false
-                // Permission is not granted
-                // Should we show an explanation?
                 if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                                 Manifest.permission.ACCESS_FINE_LOCATION)) {
-                    // Show an explanation to the user *asynchronously* -- don't block
-                    // this thread waiting for the user's response! After the user
-                    // sees the explanation, try again to request the permission.
                 } else {
                     // No explanation needed, we can request the permission.
                     ActivityCompat.requestPermissions(this,
                             arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                             myPermissions)
-
-                    // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                    // app-defined int constant. The callback method gets the
-                    // result of the request.
                 }
             } else {
                 // Permission has already been granted
@@ -78,7 +115,6 @@ class TrekActivity : AppCompatActivity() {
                     } else{
                         displayLocation(location)
                     }
-                    // Got last known location. In some rare situations this can be null.
                 }
             }
         }
@@ -122,18 +158,11 @@ class TrekActivity : AppCompatActivity() {
             // Should we show an explanation?
             if (ActivityCompat.shouldShowRequestPermissionRationale(this,
                             Manifest.permission.ACCESS_FINE_LOCATION)) {
-                // Show an explanation to the user *asynchronously* -- don't block
-                // this thread waiting for the user's response! After the user
-                // sees the explanation, try again to request the permission.
             } else {
                 // No explanation needed, we can request the permission.
                 ActivityCompat.requestPermissions(this,
                         arrayOf(Manifest.permission.ACCESS_FINE_LOCATION),
                         myPermissions)
-
-                // MY_PERMISSIONS_REQUEST_READ_CONTACTS is an
-                // app-defined int constant. The callback method gets the
-                // result of the request.
             }
         } else {
             // Permission has already been granted
@@ -175,11 +204,7 @@ class TrekActivity : AppCompatActivity() {
 
         task.addOnFailureListener { exception ->
             if (exception is ResolvableApiException){
-                // Location settings are not satisfied, but this can be fixed
-                // by showing the user a dialog.
                 try {
-                    // Show the dialog by calling startResolutionForResult(),
-                    // and check the result in onActivityResult().
                     exception.startResolutionForResult(this@TrekActivity, myPermissions)
                 } catch (sendEx: IntentSender.SendIntentException) {
                     // Ignore the error.
@@ -196,9 +221,6 @@ class TrekActivity : AppCompatActivity() {
             requestingLocationUpdates = savedInstanceState.getBoolean(
                     requestUpdate)
         }
-
-        // ...
-
         // Update UI to match restored state
         onCreate(savedInstanceState)
     }
