@@ -4,6 +4,8 @@ import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import android.view.View
+import android.view.View.GONE
 import com.google.android.gms.maps.CameraUpdateFactory
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
@@ -34,9 +36,26 @@ class mapBox : AppCompatActivity() {
 
         trekId = intent.getStringExtra("trekId")          // At present sending the id as a string
         fileName = "${filesDir}/trekData_$trekId"
-        var file = File(fileName)
+        val file = File(fileName)
         trekInfo = JSONObject(file.readText())
         Log.i("mapBox The file content", file.readText())
+
+        my_location.setOnClickListener {
+
+            if (cardView.visibility.equals(GONE)){
+                cardView.visibility = View.VISIBLE
+            }
+            else{
+                cardView.visibility = View.GONE
+            }
+        }
+
+
+
+//        loadMap(savedInstanceState)
+    }
+
+    fun loadMap(savedInstanceState: Bundle?){
 
         mapView1.onCreate(savedInstanceState)
 
@@ -55,7 +74,7 @@ class mapBox : AppCompatActivity() {
 //        mapView1
 
         mapView1.getMapAsync{
-//            it.uiSettings.setAllGesturesEnabled(false)
+            //            it.uiSettings.setAllGesturesEnabled(false)
             it.setMaxZoomPreference(19.0)
             it.setMinZoomPreference(16.0)
             it.setLatLngBoundsForCameraTarget(latLngBounds)
@@ -122,11 +141,6 @@ class mapBox : AppCompatActivity() {
             mapboxMap.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 7000)
         }
 
-        //mapView.getMapAsync(
-        //)
-        //mapView.getMapAsync({
-        //   it.setStyle(Style.SATELLITE)
-        //})
     }
 
     private fun placeMarker(mapboxMap: MapboxMap, lat: Double, lon: Double, title: String){
@@ -174,5 +188,10 @@ class mapBox : AppCompatActivity() {
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mapView1.onSaveInstanceState(outState)
+    }
+
+    fun onPlaceSelect(){
+
+
     }
 }

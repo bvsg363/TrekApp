@@ -73,7 +73,7 @@ class DownloadMap : AppCompatActivity() {
         }
 
         download_button.setOnClickListener {
-            getTrekData(false, true, true, 19.13, 72.96, 19.08, 72.86)
+            getTrekData(false, true, true, 19.136674, 72.913977, 19.144813, 72.920681)
         }
 
         delete_button.setOnClickListener {
@@ -83,6 +83,7 @@ class DownloadMap : AppCompatActivity() {
     }
 
     private fun downloadMap(latmin: Double, lonmin: Double, latmax: Double, lonmax: Double){
+
         val latLngBounds = LatLngBounds.Builder()
                 //.include(LatLng(37.7897, -119.5073)) // Northeast
                 //.include(LatLng(37.6744, -119.6815)) // Southwest
