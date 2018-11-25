@@ -46,6 +46,7 @@ class DownloadMap : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         trekId = intent.getStringExtra("trekId")          // At present sending the id as a string
         fileName = "${filesDir}/trekData_$trekId"
 
@@ -57,6 +58,12 @@ class DownloadMap : AppCompatActivity() {
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_download_map)
 
+        //     Set up the OfflineManager
+        offlineManager = OfflineManager.getInstance(this)
+
+        progressBar = findViewById<View>(R.id.progress_bar) as ProgressBar
+        progressBar?.visibility = View.INVISIBLE
+
         var file = File(fileName)
         if(!file.exists()){
             start_button.visibility = View.INVISIBLE
@@ -64,9 +71,6 @@ class DownloadMap : AppCompatActivity() {
         start_button.setOnClickListener {
             getTrekData(true, false, false)
         }
-
-        //     Set up the OfflineManager
-        offlineManager = OfflineManager.getInstance(this)
 
         download_button.setOnClickListener {
             getTrekData(false, true, false, 19.13, 72.96, 19.08, 72.86)
@@ -86,14 +90,14 @@ class DownloadMap : AppCompatActivity() {
                 //.include(LatLng(19.08, 72.86)) // Southwest
                 .include(LatLng(latmax, lonmax)) // Northeast
                 .include(LatLng(latmin, lonmin)) // Southwest
+//                .include(LatLng(19.144813, 72.920681)) // Northeast // main latts
+//                .include(LatLng(19.136674, 72.913977)) // Southwest
                 //.include(LatLng(23.36, 85.335)) // Northeast
                 //.include(LatLng(23.31, 85.284)) // Southwest
                 .build()
 
         // Define the offline region
 //            Toast.makeText(this, mapboxMap.styleUrl, Toast.LENGTH_SHORT).show()
-        //Toast.makeText(this, "mapbox://styles/mapbox/streets-v10", Toast.LENGTH_SHORT).show()
-        //val definition = OfflineTilePyramidRegionDefinition(
         Toast.makeText(this, getString(R.string.mapBox_styleUrl_satellite), Toast.LENGTH_SHORT).show()
         val definition = OfflineTilePyramidRegionDefinition(
 //                    mapboxMap.styleUrl,
@@ -125,7 +129,7 @@ class DownloadMap : AppCompatActivity() {
 //                            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
 
                         // Display the download progress bar
-                        progressBar = findViewById<View>(R.id.progress_bar) as ProgressBar
+//                        progressBar = findViewById<View>(R.id.progress_bar) as ProgressBar
                         startProgress()
 
                         Log.i("DownloadMap", "entered create offline map")
@@ -203,6 +207,7 @@ class DownloadMap : AppCompatActivity() {
     }
 
     private fun getTrekData(gotoMapFlag: Boolean, downloadMap: Boolean, calcBound: Boolean, latmin: Double=0.0, lonmin: Double=0.0, latmax: Double=0.0, lonmax: Double=0.0):Boolean{
+
         val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
         //val uid = sharedPreferences.getInt("uid", 0)
         val url = GlobalVariables().trekDataUrl
