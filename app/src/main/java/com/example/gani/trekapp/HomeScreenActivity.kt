@@ -34,6 +34,7 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
     val treksList : ArrayList<Pair<Int, String>> = ArrayList()
     val displayList : ArrayList<Pair<Int, String>> = ArrayList()
+    var searchView : SearchView? = null
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -61,17 +62,6 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         recycler_view.layoutManager = LinearLayoutManager(this)
         recycler_view.adapter = TreksListAdapter(treksList, this)
 
-        (recycler_view.adapter as TreksListAdapter).onItemClick = {
-            str ->
-            //val intent = Intent(this, TrekActivity::class.java)
-            //intent.putExtra("trekName", str)
-            //val intent = Intent(this, MapActivity::class.java)
-            //val intent = Intent(this, mapBox::class.java)
-            val intent = Intent(this, DownloadMap::class.java)
-            intent.putExtra("trekName", str)
-            startActivity(intent)
-        }
-
 
         val navigationView = findViewById<View>(R.id.nav_view) as NavigationView
         val headerView = navigationView.getHeaderView(0)
@@ -80,9 +70,6 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         val navUsermail = headerView.findViewById(R.id.nav_profile_mail) as TextView
         navUsermail.text = sharedPreferences.getString("email", getString(R.string.nav_header_subtitle))
-
-//        nav_profile_mail.text = sharedPreferences.getString("email", getString(R.string.nav_header_subtitle))
-//        nav_profile_username.text = sharedPreferences.getString("username", getString(R.string.nav_header_title))
 
         fab.setOnClickListener { view ->
 //            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
@@ -114,9 +101,9 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         // as you specify a parent activity in AndroidManifest.xml.
         when (item.itemId) {
             R.id.menu_search -> {
-                val searchView = item.actionView as SearchView
+                searchView = item.actionView as SearchView
 
-                searchView.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+                searchView?.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
 
                     override fun onQueryTextSubmit(query: String?): Boolean {
                         return true
@@ -229,6 +216,7 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
         })
 
         requestQueue.add(jsonRequest)
+
     }
 
     fun displayTreks(response: JSONObject){
@@ -245,10 +233,16 @@ class HomeScreenActivity : AppCompatActivity(), NavigationView.OnNavigationItemS
 
         (recycler_view.adapter as TreksListAdapter).onItemClick = {
             str ->
+            val intent = Intent(this, DownloadMap::class.java)
+
+//            searchView?.setQuery("", false)
+//            searchView?.clearFocus()
+//            searchView?.onActionViewCollapsed()
+
+
             //val intent = Intent(this, TrekActivity::class.java)
             //intent.putExtra("trekName", str)
-            val intent = Intent(this, DownloadMap::class.java)
-            intent.putExtra("trekName", str)
+            intent.putExtra("trekId", str)
             startActivity(intent)
         }
     }

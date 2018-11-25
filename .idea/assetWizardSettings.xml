@@ -19,19 +19,8 @@
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="$USER_HOME$/Desktop/trekIMg.svg" />
-                                      <entry key="outputName" value="trekIMG" />
-                                    </map>
-                                  </option>
-                                </PersistentState>
-                              </value>
-                            </entry>
-                            <entry key="launcher">
-                              <value>
-                                <PersistentState>
-                                  <option name="values">
-                                    <map>
-                                      <entry key="foregroundImage" value="$USER_HOME$/Desktop/defaultTrek.jpg" />
+                                      <entry key="imageAsset" value="$USER_HOME$/Pictures/ml.png" />
+                                      <entry key="outputName" value="sample" />
                                     </map>
                                   </option>
                                 </PersistentState>
@@ -40,26 +29,11 @@
                             <entry key="launcherLegacy">
                               <value>
                                 <PersistentState>
-                                  <option name="children">
-                                    <map>
-                                      <entry key="image">
-                                        <value>
-                                          <PersistentState>
-                                            <option name="values">
-                                              <map>
-                                                <entry key="paddingPercent" value="-10" />
-                                              </map>
-                                            </option>
-                                          </PersistentState>
-                                        </value>
-                                      </entry>
-                                    </map>
-                                  </option>
                                   <option name="values">
                                     <map>
                                       <entry key="assetType" value="IMAGE" />
-                                      <entry key="imageAsset" value="$USER_HOME$/Desktop/defaultTrek.jpg" />
-                                      <entry key="outputName" value="trekImg" />
+                                      <entry key="imageAsset" value="$USER_HOME$/Pictures/pics/IMG_20180128_074501.jpg" />
+                                      <entry key="outputName" value="trek" />
                                     </map>
                                   </option>
                                 </PersistentState>

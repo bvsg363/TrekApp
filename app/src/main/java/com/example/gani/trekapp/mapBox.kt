@@ -34,7 +34,7 @@ class mapBox : AppCompatActivity() {
         var file = File(fileName)
         trekInfo = JSONObject(file.readText())
         Log.i("mapBox The file content", file.readText())
-        mapView.onCreate(savedInstanceState)
+        mapView1.onCreate(savedInstanceState)
         /*mapView.getMapAsync(new OnMapReadyCallback() {
             @Override
             public void onMapReady(MapboxMap mapboxMap) {
@@ -53,7 +53,7 @@ class mapBox : AppCompatActivity() {
         polygonLatLongList.add(LatLng(19.140, 72.920))
 
 
-        mapView.getMapAsync {
+        mapView1.getMapAsync {
             mapboxMap ->
 
             //mapboxMap.addMarker(MarkerOptions()
@@ -85,36 +85,36 @@ class mapBox : AppCompatActivity() {
 
     override fun onResume(){
         super.onResume()
-        mapView.onResume()
+        mapView1.onResume()
     }
 
     override fun onStart() {
         super.onStart()
-        mapView.onStart()
+        mapView1.onStart()
     }
 
     override fun onStop() {
         super.onStop()
-        mapView.onStop()
+        mapView1.onStop()
     }
 
     public override fun onPause() {
         super.onPause()
-        mapView.onPause()
+        mapView1.onPause()
     }
 
     override fun onLowMemory() {
         super.onLowMemory()
-        mapView.onLowMemory()
+        mapView1.onLowMemory()
     }
 
     override fun onDestroy() {
         super.onDestroy()
-        mapView.onDestroy()
+        mapView1.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
-        mapView.onSaveInstanceState(outState)
+        mapView1.onSaveInstanceState(outState)
     }
 }

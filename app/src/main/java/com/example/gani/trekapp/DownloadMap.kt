@@ -41,12 +41,12 @@ class DownloadMap : AppCompatActivity() {
     private var trekId: String? = null
     private var progressBar: ProgressBar? = null
     private var trekData: JSONObject? = null
-//    private var mapView: MapView? = null
+
     private var offlineManager: OfflineManager? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        trekId = intent.getStringExtra("trekName")          // At present sending the id as a string
+        trekId = intent.getStringExtra("trekId")          // At present sending the id as a string
         fileName = "${filesDir}/trekData_$trekId"
 
 
@@ -56,7 +56,6 @@ class DownloadMap : AppCompatActivity() {
 
         // This contains the MapView in XML and needs to be called after the access token is configured.
         setContentView(R.layout.activity_download_map)
-        imageView.setImageResource(R.drawable.hi)
 
         var file = File(fileName)
         if(!file.exists()){
@@ -71,6 +70,10 @@ class DownloadMap : AppCompatActivity() {
 
         download_button.setOnClickListener {
             getTrekData(false, true, false, 19.13, 72.96, 19.08, 72.86)
+        }
+
+        delete_button.setOnClickListener {
+            deleteMap()
         }
 
     }
@@ -89,13 +92,15 @@ class DownloadMap : AppCompatActivity() {
 
         // Define the offline region
 //            Toast.makeText(this, mapboxMap.styleUrl, Toast.LENGTH_SHORT).show()
-        Toast.makeText(this, "mapbox://styles/mapbox/streets-v10", Toast.LENGTH_SHORT).show()
+        //Toast.makeText(this, "mapbox://styles/mapbox/streets-v10", Toast.LENGTH_SHORT).show()
+        //val definition = OfflineTilePyramidRegionDefinition(
+        Toast.makeText(this, getString(R.string.mapBox_styleUrl_satellite), Toast.LENGTH_SHORT).show()
         val definition = OfflineTilePyramidRegionDefinition(
 //                    mapboxMap.styleUrl,
-                "mapbox://styles/mapbox/streets-v10",
+                getString(R.string.mapBox_styleUrl_satellite),
                 latLngBounds,
-                10.0,
-                20.0,
+                16.0,
+                19.0,
                 this.resources.displayMetrics.density)
 
         // Set the metadata
@@ -123,8 +128,36 @@ class DownloadMap : AppCompatActivity() {
                         progressBar = findViewById<View>(R.id.progress_bar) as ProgressBar
                         startProgress()
 
+                        Log.i("DownloadMap", "entered create offline map")
+
+//                        offlineRegion.getStatus(object : OfflineRegion.OfflineRegionStatusCallback {
+//
+//
+//
+//                            override fun onStatus(offlineRegionStatus: OfflineRegionStatus) {
+//                                Log.i("DownloadMap", offlineRegionStatus.requiredResourceCount.toString())
+//
+//                                if (offlineRegionStatus.isComplete) {
+//                                    Log.e("DownloadMap", "Offline Map Data found, not downloading it again")
+//                                } else {
+//                                    if (offlineRegionStatus.downloadState == OfflineRegion.STATE_ACTIVE) {
+//                                        Log.e("DownloadMap", "Offline Map Data download still running, not downloading it twice")
+//                                    } else {
+//                                        Log.e("DownloadMap", "Map Data found but incomplete, resume download")
+////                                        offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+//                                    }
+//                                }
+//                            }
+//
+//                            override fun onError(error: String) {
+//                                Log.e("DownloadMap", "onStatusError: $error, try downloading map")
+//                            }
+//
+//                        })
+
                         // Monitor the download progress using setObserver
                         offlineRegion.setObserver(object : OfflineRegion.OfflineRegionObserver {
+
                             override fun onStatusChanged(status: OfflineRegionStatus) {
 
                                 // Calculate the download percentage and update the progress bar
@@ -138,6 +171,8 @@ class DownloadMap : AppCompatActivity() {
                                     endProgress("Success")
                                     //getTrekData(false)
                                     start_button.visibility = View.VISIBLE
+                                    Log.i("DownloadMap", status.requiredResourceCount.toString())
+
                                 } else if (status.isRequiredResourceCountPrecise) {
                                     // Switch to determinate state
                                     setPercentage(Math.round(percentage).toInt())
@@ -237,33 +272,6 @@ class DownloadMap : AppCompatActivity() {
     public override fun onPause() {
         super.onPause()
 //        mapView!!.onPause()
-        if (offlineManager != null) {
-            offlineManager!!.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
-                override fun onList(offlineRegions: Array<OfflineRegion>) {
-                    if (offlineRegions.size > 0) {
-                        // delete the last item in the offlineRegions list which will be yosemite offline map
-                        offlineRegions[offlineRegions.size - 1].delete(object : OfflineRegion.OfflineRegionDeleteCallback {
-                            override fun onDelete() {
-                                Toast.makeText(
-                                        this@DownloadMap,
-                                        "Offline deleted",
-                                        Toast.LENGTH_LONG
-                                ).show()
-
-                            }
-
-                            override fun onError(error: String) {
-                                Log.e(TAG, "On Delete error: $error")
-                            }
-                        })
-                    }
-                }
-
-                override fun onError(error: String) {
-                    Log.e(TAG, "onListError: $error")
-                }
-            })
-        }
     }
 
     // Progress bar methods
@@ -305,5 +313,38 @@ class DownloadMap : AppCompatActivity() {
         val JSON_CHARSET = "UTF-8"
         val JSON_FIELD_REGION_NAME = "FIELD_REGION_NAME"
     }
-}
 
+    fun deleteMap(){
+
+        if (offlineManager != null) {
+            offlineManager!!.listOfflineRegions(object : OfflineManager.ListOfflineRegionsCallback {
+                override fun onList(offlineRegions: Array<OfflineRegion>) {
+
+                    Log.i("DownloadMap", offlineRegions.size.toString())
+
+                    if (offlineRegions.size > 0) {
+                        // delete the last item in the offlineRegions list which will be yosemite offline map
+                        offlineRegions[offlineRegions.size - 1].delete(object : OfflineRegion.OfflineRegionDeleteCallback {
+                            override fun onDelete() {
+                                Toast.makeText(
+                                        this@DownloadMap,
+                                        "Offline deleted",
+                                        Toast.LENGTH_LONG
+                                ).show()
+
+                            }
+
+                            override fun onError(error: String) {
+                                Log.e(TAG, "On Delete error: $error")
+                            }
+                        })
+                    }
+                }
+
+                override fun onError(error: String) {
+                    Log.e(TAG, "onListError: $error")
+                }
+            })
+        }
+    }
+}
