@@ -40,6 +40,7 @@ class DownloadMap : AppCompatActivity() {
     private var fileName: String? = null
     private var trekId: String? = null
     private var progressBar: ProgressBar? = null
+    private var trekData: JSONObject? = null
 //    private var mapView: MapView? = null
     private var offlineManager: OfflineManager? = null
 
@@ -62,115 +63,111 @@ class DownloadMap : AppCompatActivity() {
             start_button.visibility = View.INVISIBLE
         }
         start_button.setOnClickListener {
-
-            //if (!sharedPreferences.contains("treksAvailable")) {
-            //    Toast.makeText(this, "trekNames not available", Toast.LENGTH_SHORT).show()
-            //}
-            //val trekList = JSONObject(sharedPreferences.getString("treksAvailable", ""))
-            val mapStartIntent = Intent(this, mapBox::class.java)
-            startActivity(mapStartIntent)
-            getTrekData(true)
+            getTrekData(true, false, false)
         }
-//        mapView = findViewById<View>(R.id.mapView) as MapView
-//        mapView!!.onCreate(savedInstanceState)
-//        mapView!!.getMapAsync { mapboxMap ->
+
         //     Set up the OfflineManager
         offlineManager = OfflineManager.getInstance(this)
 
         download_button.setOnClickListener {
-            // Create a bounding box for the offline region
-            val latLngBounds = LatLngBounds.Builder()
-                    //.include(LatLng(37.7897, -119.5073)) // Northeast
-                    //.include(LatLng(37.6744, -119.6815)) // Southwest
-                    .include(LatLng(19.13, 72.96)) // Northeast
-                    .include(LatLng(19.08, 72.86)) // Southwest
-                    //.include(LatLng(23.36, 85.335)) // Northeast
-                    //.include(LatLng(23.31, 85.284)) // Southwest
-                    .build()
-
-            // Define the offline region
-//            Toast.makeText(this, mapboxMap.styleUrl, Toast.LENGTH_SHORT).show()
-            Toast.makeText(this, "mapbox://styles/mapbox/streets-v10", Toast.LENGTH_SHORT).show()
-            val definition = OfflineTilePyramidRegionDefinition(
-//                    mapboxMap.styleUrl,
-                    "mapbox://styles/mapbox/streets-v10",
-                    latLngBounds,
-                    10.0,
-                    20.0,
-                    this.resources.displayMetrics.density)
-
-            // Set the metadata
-            var metadata: ByteArray?
-            try {
-                val jsonObject = JSONObject()
-                jsonObject.put(JSON_FIELD_REGION_NAME, "Yosemite National Park")
-                val json = jsonObject.toString()
-                metadata = json.toByteArray(charset(JSON_CHARSET))
-            } catch (exception: Exception) {
-                Log.e(TAG, "Failed to encode metadata: " + exception.message)
-                metadata = null
-            }
-
-            // Create the region asynchronously
-
-            offlineManager!!.createOfflineRegion(
-                    definition,
-                    metadata!!,
-                    object : OfflineManager.CreateOfflineRegionCallback {
-                        override fun onCreate(offlineRegion: OfflineRegion) {
-//                            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
-
-                            // Display the download progress bar
-                            progressBar = findViewById<View>(R.id.progress_bar) as ProgressBar
-                            startProgress()
-
-                            // Monitor the download progress using setObserver
-                            offlineRegion.setObserver(object : OfflineRegion.OfflineRegionObserver {
-                                override fun onStatusChanged(status: OfflineRegionStatus) {
-
-                                    // Calculate the download percentage and update the progress bar
-                                    val percentage = if (status.requiredResourceCount >= 0)
-                                        100.0 * status.completedResourceCount / status.requiredResourceCount
-                                    else
-                                        0.0
-
-                                    if (status.isComplete) {
-                                        // Download complete
-                                        endProgress("Success")
-                                        getTrekData(false)
-                                    } else if (status.isRequiredResourceCountPrecise) {
-                                        // Switch to determinate state
-                                        setPercentage(Math.round(percentage).toInt())
-                                    }
-                                }
-
-                                override fun onError(error: OfflineRegionError) {
-                                    // If an error occurs, print to logcat
-                                    Log.e(TAG, "onError reason: " + error.reason)
-                                    Log.e(TAG, "onError message: " + error.message)
-                                }
-
-                                override fun mapboxTileCountLimitExceeded(limit: Long) {
-                                    // Notify if offline region exceeds maximum tile count
-                                    Log.e(TAG, "Mapbox tile count limit exceeded: $limit")
-                                }
-                            })
-
-                            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
-
-                        }
-
-                        override fun onError(error: String) {
-                            Log.e(TAG, "Error: $error")
-                        }
-                    }
-            )
-
+            getTrekData(false, true, false, 19.13, 72.96, 19.08, 72.86)
         }
 
     }
 
-    private fun getTrekData(gotoMapFlag: Boolean):Boolean{
+    private fun downloadMap(latmin: Double, lonmin: Double, latmax: Double, lonmax: Double){
+        val latLngBounds = LatLngBounds.Builder()
+                //.include(LatLng(37.7897, -119.5073)) // Northeast
+                //.include(LatLng(37.6744, -119.6815)) // Southwest
+                //.include(LatLng(19.13, 72.96)) // Northeast
+                //.include(LatLng(19.08, 72.86)) // Southwest
+                .include(LatLng(latmax, lonmax)) // Northeast
+                .include(LatLng(latmin, lonmin)) // Southwest
+                //.include(LatLng(23.36, 85.335)) // Northeast
+                //.include(LatLng(23.31, 85.284)) // Southwest
+                .build()
+
+        // Define the offline region
+//            Toast.makeText(this, mapboxMap.styleUrl, Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "mapbox://styles/mapbox/streets-v10", Toast.LENGTH_SHORT).show()
+        val definition = OfflineTilePyramidRegionDefinition(
+//                    mapboxMap.styleUrl,
+                "mapbox://styles/mapbox/streets-v10",
+                latLngBounds,
+                10.0,
+                20.0,
+                this.resources.displayMetrics.density)
+
+        // Set the metadata
+        var metadata: ByteArray?
+        try {
+            val jsonObject = JSONObject()
+            jsonObject.put(JSON_FIELD_REGION_NAME, "Yosemite National Park")
+            val json = jsonObject.toString()
+            metadata = json.toByteArray(charset(JSON_CHARSET))
+        } catch (exception: Exception) {
+            Log.e(TAG, "Failed to encode metadata: " + exception.message)
+            metadata = null
+        }
+
+        // Create the region asynchronously
+
+        offlineManager!!.createOfflineRegion(
+                definition,
+                metadata!!,
+                object : OfflineManager.CreateOfflineRegionCallback {
+                    override fun onCreate(offlineRegion: OfflineRegion) {
+//                            offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+
+                        // Display the download progress bar
+                        progressBar = findViewById<View>(R.id.progress_bar) as ProgressBar
+                        startProgress()
+
+                        // Monitor the download progress using setObserver
+                        offlineRegion.setObserver(object : OfflineRegion.OfflineRegionObserver {
+                            override fun onStatusChanged(status: OfflineRegionStatus) {
+
+                                // Calculate the download percentage and update the progress bar
+                                val percentage = if (status.requiredResourceCount >= 0)
+                                    100.0 * status.completedResourceCount / status.requiredResourceCount
+                                else
+                                    0.0
+
+                                if (status.isComplete) {
+                                    // Download complete
+                                    endProgress("Success")
+                                    //getTrekData(false)
+                                    start_button.visibility = View.VISIBLE
+                                } else if (status.isRequiredResourceCountPrecise) {
+                                    // Switch to determinate state
+                                    setPercentage(Math.round(percentage).toInt())
+                                }
+                            }
+
+                            override fun onError(error: OfflineRegionError) {
+                                // If an error occurs, print to logcat
+                                Log.e(TAG, "onError reason: " + error.reason)
+                                Log.e(TAG, "onError message: " + error.message)
+                            }
+
+                            override fun mapboxTileCountLimitExceeded(limit: Long) {
+                                // Notify if offline region exceeds maximum tile count
+                                Log.e(TAG, "Mapbox tile count limit exceeded: $limit")
+                            }
+                        })
+
+                        offlineRegion.setDownloadState(OfflineRegion.STATE_ACTIVE)
+
+                    }
+
+                    override fun onError(error: String) {
+                        Log.e(TAG, "Error: $error")
+                    }
+                }
+        )
+    }
+
+    private fun getTrekData(gotoMapFlag: Boolean, downloadMap: Boolean, calcBound: Boolean, latmin: Double=0.0, lonmin: Double=0.0, latmax: Double=0.0, lonmax: Double=0.0):Boolean{
         val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
         //val uid = sharedPreferences.getInt("uid", 0)
         val url = GlobalVariables().trekDataUrl
@@ -180,13 +177,18 @@ class DownloadMap : AppCompatActivity() {
         val jsonRequest = JsonObjectRequest(Request.Method.GET, finalUrl, null, Response.Listener<JSONObject>{ response ->
 
             print(response)
+            trekData = response
             Log.i("TrekData", response.getString("status"))
 
             if (response.getString("status") == "success"){
 //                Toast.makeText(this, "Success getting treks", Toast.LENGTH_SHORT).show()
                 saveTrekData(response)
-                if(gotoMapFlag){
+                if(downloadMap){
+                    downloadMap(latmin, lonmin, latmax, lonmax)
+                }
+                else if(gotoMapFlag){
                     val mapStartIntent = Intent(this, mapBox::class.java)
+                    mapStartIntent.putExtra("trekId", trekId)
                     startActivity(mapStartIntent)
                 }
                 else{
@@ -201,6 +203,7 @@ class DownloadMap : AppCompatActivity() {
                 Toast.makeText(this, "Error in database", Toast.LENGTH_SHORT).show()
                 if(gotoMapFlag){
                     val mapStartIntent = Intent(this, mapBox::class.java)
+                    mapStartIntent.putExtra("trekId", trekId)
                     startActivity(mapStartIntent)
                 }
             }
@@ -211,6 +214,7 @@ class DownloadMap : AppCompatActivity() {
             Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
             if(gotoMapFlag){
                 val mapStartIntent = Intent(this, mapBox::class.java)
+                mapStartIntent.putExtra("trekId", trekId)
                 startActivity(mapStartIntent)
             }
 
