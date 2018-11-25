@@ -2,7 +2,7 @@ package com.example.gani.trekapp
 
 class GlobalVariables {
 
-    val ip = "10.196.7.216"
+    val ip = "192.168.0.4"
 
     val loginUrl = "http://$ip:8080/TrekAppServer/Login"
     val signUpUrl = "http://$ip:8080/TrekAppServer/Signup"
