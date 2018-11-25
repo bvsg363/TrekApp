@@ -60,6 +60,14 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
         }
 
+        card_get_directions.setOnClickListener {
+            Toast.makeText(this, "hi", Toast.LENGTH_SHORT).show()
+        }
+
+        cardView.setOnClickListener {
+
+        }
+
 
 
         loadMap(savedInstanceState)
@@ -104,7 +112,7 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
             mapboxMap.setOnMarkerClickListener {marker ->
                 onPlaceSelect(marker)
-                Toast.makeText(this, marker.title, Toast.LENGTH_SHORT).show()
+//                Toast.makeText(this, marker.title, Toast.LENGTH_SHORT).show()
                 true
             }
 
@@ -151,7 +159,7 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             val center_lat = (trekInfo?.getDouble("ne-lat")!! + trekInfo?.getDouble("sw-lat")!!)/2
             val center_long = (trekInfo?.getDouble("ne-long")!! + trekInfo?.getDouble("sw-long")!!)/2
             val position: CameraPosition = CameraPosition.Builder()
-                    .target(LatLng(center_lat, center_long))
+                    .target(LatLng(19.141181, 72.918032))
                     .zoom(17.0)
                     .bearing(0.0)
                     .tilt(30.0)
@@ -227,7 +235,8 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
     private fun placeMarker(mapboxMap: MapboxMap, lat: Double, lon: Double, title: String){
         mapboxMap.addMarker(MarkerOptions()
                 .position(LatLng(lat, lon))
-                .title(title))
+                .title(title)
+        )
     }
 
     /*
