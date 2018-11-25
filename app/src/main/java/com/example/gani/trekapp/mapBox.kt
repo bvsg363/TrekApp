@@ -43,10 +43,12 @@ class mapBox : AppCompatActivity() {
         val latLngBounds = LatLngBounds.Builder()
                 //.include(LatLng(37.7897, -119.5073)) // Northeast
                 //.include(LatLng(37.6744, -119.6815)) // Southwest
-                .include(LatLng(19.144813, 72.920681)) // Northeast
-                .include(LatLng(19.136674, 72.913977)) // Southwest
+                //.include(LatLng(19.144813, 72.920681)) // Northeast
+                //.include(LatLng(19.136674, 72.913977)) // Southwest
                 //.include(LatLng(23.36, 85.335)) // Northeast
                 //.include(LatLng(23.31, 85.284)) // Southwest
+                .include(LatLng(trekInfo?.getDouble("ne-lat")!!, trekInfo?.getDouble("ne-long")!!)) // Northeast
+                .include(LatLng(trekInfo?.getDouble("sw-lat")!!, trekInfo?.getDouble("sw-long")!!)) // Southwest
                 .build()
 
 //        mapView1.set
@@ -59,12 +61,12 @@ class mapBox : AppCompatActivity() {
             it.setLatLngBoundsForCameraTarget(latLngBounds)
         }
 
-        val polygonLatLongList = ArrayList<LatLng>()
-        polygonLatLongList.add(LatLng(19.130, 72.910))
-        polygonLatLongList.add(LatLng(19.135, 72.910))
-        polygonLatLongList.add(LatLng(19.135, 72.915))
-        polygonLatLongList.add(LatLng(19.140, 72.915))
-        polygonLatLongList.add(LatLng(19.140, 72.920))
+//        val polygonLatLongList = ArrayList<LatLng>()
+//        polygonLatLongList.add(LatLng(19.130, 72.910))
+//        polygonLatLongList.add(LatLng(19.135, 72.910))
+//        polygonLatLongList.add(LatLng(19.135, 72.915))
+//        polygonLatLongList.add(LatLng(19.140, 72.915))
+//        polygonLatLongList.add(LatLng(19.140, 72.920))
 
 
         mapView1.getMapAsync {
@@ -73,6 +75,12 @@ class mapBox : AppCompatActivity() {
             //mapboxMap.addMarker(MarkerOptions()
             //        .position(LatLng(19.1334, 72.9133))
             //        .title("IITB"))
+
+            var start_arr = trekInfo?.getJSONArray("start_points")!!
+            var start_point = start_arr.getJSONObject(0)
+            mapboxMap.addMarker(MarkerOptions()
+                    .position(LatLng(start_point.getDouble("lat"), start_point.getDouble("long")))
+                    .title("Start point"))
 
             var places = trekInfo?.getJSONArray("places")!!
             for(i in 0..(places.length()-1))
