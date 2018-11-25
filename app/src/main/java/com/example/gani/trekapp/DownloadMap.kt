@@ -69,7 +69,7 @@ class DownloadMap : AppCompatActivity() {
         offlineManager = OfflineManager.getInstance(this)
 
         download_button.setOnClickListener {
-            getTrekData(false, true, false, 19.13, 72.96, 19.08, 72.86)
+            getTrekData(false, true, true, 19.13, 72.96, 19.08, 72.86)
         }
 
         delete_button.setOnClickListener {
@@ -202,6 +202,11 @@ class DownloadMap : AppCompatActivity() {
         )
     }
 
+    //private fun downloadImage(){
+    //    val url = GlobalVariables().trekImageUrl
+
+    //}
+
     private fun getTrekData(gotoMapFlag: Boolean, downloadMap: Boolean, calcBound: Boolean, latmin: Double=0.0, lonmin: Double=0.0, latmax: Double=0.0, lonmax: Double=0.0):Boolean{
         val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
         //val uid = sharedPreferences.getInt("uid", 0)
@@ -219,7 +224,17 @@ class DownloadMap : AppCompatActivity() {
 //                Toast.makeText(this, "Success getting treks", Toast.LENGTH_SHORT).show()
                 saveTrekData(response)
                 if(downloadMap){
-                    downloadMap(latmin, lonmin, latmax, lonmax)
+                    if(calcBound){
+                        Toast.makeText(this, trekData?.toString(), Toast.LENGTH_LONG).show()!!
+                        var Latmin = trekData?.getDouble("sw-lat")?.toDouble()!!
+                        var Lonmin = trekData?.getDouble("sw-long")?.toDouble()!!
+                        var Latmax = trekData?.getDouble("ne-lat")?.toDouble()!!
+                        var Lonmax = trekData?.getDouble("ne-long")?.toDouble()!!
+                        downloadMap(Latmin, Lonmin, Latmax, Lonmax)
+                    }
+                    else {
+                        downloadMap(latmin, lonmin, latmax, lonmax)
+                    }
                 }
                 else if(gotoMapFlag){
                     val mapStartIntent = Intent(this, mapBox::class.java)

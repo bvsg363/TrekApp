@@ -4,11 +4,14 @@ import android.graphics.Color
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
+import com.google.android.gms.maps.CameraUpdateFactory
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.annotations.PolylineOptions
+import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.constants.Style
 import com.mapbox.mapboxsdk.geometry.LatLng
+import com.mapbox.mapboxsdk.geometry.LatLngBounds
 import com.mapbox.mapboxsdk.maps.MapView
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import com.mapbox.mapboxsdk.maps.OnMapReadyCallback
@@ -59,11 +62,45 @@ class mapBox : AppCompatActivity() {
             //mapboxMap.addMarker(MarkerOptions()
             //        .position(LatLng(19.1334, 72.9133))
             //        .title("IITB"))
-            placeMarker(mapboxMap, 19.1334, 72.9133, "IITB")
-            mapboxMap.addPolyline(PolylineOptions()
-                    .addAll(polygonLatLongList)
-                    .color(Color.BLUE)
-                    .width(2f))
+
+            var places = trekInfo?.getJSONArray("places")!!
+            for(i in 0..(places.length()-1))
+            {
+                var place = places.getJSONObject(i)
+                placeMarker(mapboxMap, place.getDouble("lat"), place.getDouble("long"), place.getString("name"))
+            }
+
+            //placeMarker(mapboxMap, 19.1334, 72.9133, "IITB")
+            var lines = trekInfo?.getJSONArray("paths")!!
+            for(i in 0..(lines.length() - 1))
+            {
+                var segment = lines.getJSONObject(i)
+                val lineSegment = ArrayList<LatLng>()
+                lineSegment.add(LatLng(segment.getDouble("flat"),segment.getDouble("flong")))
+                lineSegment.add(LatLng(segment.getDouble("slat"),segment.getDouble("slong")))
+                mapboxMap.addPolyline(PolylineOptions()
+                        .addAll(lineSegment)
+                        .color(Color.parseColor("#3895D3"))
+                        .width(5f))
+            }
+            //mapboxMap.addPolyline(PolylineOptions()
+            //        .addAll(polygonLatLongList)
+            //        .color(Color.BLUE)
+            //        .width(2f))
+            var latLngBounds = LatLngBounds.Builder()
+                    .include(LatLng(0.0, 0.0))
+                    .include(LatLng(2.0, 2.0))
+                    .build()
+            //mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0))
+            var center_lat = (trekInfo?.getDouble("ne-lat")!! + trekInfo?.getDouble("sw-lat")!!)/2
+            var center_long = (trekInfo?.getDouble("ne-long")!! + trekInfo?.getDouble("sw-long")!!)/2
+            var position: CameraPosition = CameraPosition.Builder()
+                    .target(LatLng(center_lat, center_long))
+                    .zoom(17.0)
+                    .bearing(0.0)
+                    .tilt(30.0)
+                    .build()
+            mapboxMap.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 7000)
         }
 
         //mapView.getMapAsync(
