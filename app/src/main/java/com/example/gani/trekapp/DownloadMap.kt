@@ -64,7 +64,7 @@ class DownloadMap : AppCompatActivity() {
         progressBar = findViewById<View>(R.id.progress_bar) as ProgressBar
         progressBar?.visibility = View.INVISIBLE
 
-        var file = File(fileName)
+        val file = File(fileName)
         if(!file.exists()){
             start_button.visibility = View.INVISIBLE
         }
@@ -214,7 +214,7 @@ class DownloadMap : AppCompatActivity() {
 
     private fun getTrekData(gotoMapFlag: Boolean, downloadMap: Boolean, calcBound: Boolean, latmin: Double=0.0, lonmin: Double=0.0, latmax: Double=0.0, lonmax: Double=0.0):Boolean{
 
-        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+//        val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
         //val uid = sharedPreferences.getInt("uid", 0)
         val url = GlobalVariables().trekDataUrl
         val requestQueue = Volley.newRequestQueue(this)
@@ -231,11 +231,11 @@ class DownloadMap : AppCompatActivity() {
                 saveTrekData(response)
                 if(downloadMap){
                     if(calcBound){
-                        Toast.makeText(this, trekData?.toString(), Toast.LENGTH_LONG).show()!!
-                        var Latmin = trekData?.getDouble("sw-lat")?.toDouble()!!
-                        var Lonmin = trekData?.getDouble("sw-long")?.toDouble()!!
-                        var Latmax = trekData?.getDouble("ne-lat")?.toDouble()!!
-                        var Lonmax = trekData?.getDouble("ne-long")?.toDouble()!!
+                        Toast.makeText(this, trekData?.toString(), Toast.LENGTH_LONG).show()
+                        val Latmin = trekData?.getDouble("sw-lat")!!
+                        val Lonmin = trekData?.getDouble("sw-long")!!
+                        val Latmax = trekData?.getDouble("ne-lat")!!
+                        val Lonmax = trekData?.getDouble("ne-long")!!
                         downloadMap(Latmin, Lonmin, Latmax, Lonmax)
                     }
                     else {
@@ -282,11 +282,11 @@ class DownloadMap : AppCompatActivity() {
 
         requestQueue.add(jsonRequest)
 
-        return true;
+        return true
     }
 
     private fun saveTrekData(response: JSONObject) {
-        var file = File(fileName)
+        val file = File(fileName)
         file.writeText(response.toString())
     }
 
