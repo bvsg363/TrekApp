@@ -172,7 +172,7 @@ class DownloadMap : AppCompatActivity() {
         val latLngBounds = LatLngBounds.Builder()
                 //.include(LatLng(37.7897, -119.5073)) // Northeast
                 //.include(LatLng(37.6744, -119.6815)) // Southwest
-                .include(LatLng(19.148187, 72.922877)) // Northeast
+                .include(LatLng(19.147713, 72.923716)) // Northeast
                 .include(LatLng(19.136235, 72.914266)) // Southwest
                 //.include(LatLng(23.36, 85.335)) // Northeast
                 //.include(LatLng(23.31, 85.284)) // Southwest
@@ -185,8 +185,8 @@ class DownloadMap : AppCompatActivity() {
 //                    mapboxMap.styleUrl,
                 getString(R.string.mapBox_styleUrl_satellite),
                 latLngBounds,
-                15.0,
-                120.0,
+                16.0,
+                19.0,
                 this.resources.displayMetrics.density)
 
         // Set the metadata
@@ -213,6 +213,8 @@ class DownloadMap : AppCompatActivity() {
                         // Display the download progress bar
                         progressBar = findViewById<View>(R.id.progress_bar) as ProgressBar
                         startProgress()
+
+                        Log.i("DownloadMap", "entered create offline map")
 
 //                        offlineRegion.getStatus(object : OfflineRegion.OfflineRegionStatusCallback {
 //
