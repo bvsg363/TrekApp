@@ -1,6 +1,7 @@
 package com.example.gani.trekapp
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.graphics.Color
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
@@ -10,8 +11,9 @@ import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import com.google.android.gms.maps.CameraUpdateFactory
 import android.widget.Toast
+import com.google.gson.JsonArray
+import com.google.gson.JsonObject
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEngineProvider
@@ -45,16 +47,132 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
     private var mapboxMap: MapboxMap? = null
     private var locationEngine: LocationEngine? = null
 
+    private var locationArray: ArrayList<Location> = ArrayList()
+
+    private var active = 0
+    var revisit = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Mapbox.getInstance(applicationContext, getString(R.string.mapbox_access_token))
         setContentView(R.layout.activity_map_box)
 
         trekId = intent.getStringExtra("trekId")          // At present sending the id as a string
-        fileName = "${filesDir}/trekData_$trekId"
+        fileName = "$filesDir/trekData_$trekId"
         val file = File(fileName)
         trekInfo = JSONObject(file.readText())
-        Log.i("mapBox The file content", file.readText())
+//        Log.i("mapBox The file content", file.readText())
+
+        val arr : List<String> = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+                .getString("locationArray", "")
+                .split(";")
+
+        if (arr.isNotEmpty()){
+            for (i in arr){
+                Log.i("mapBox1", i)
+            }
+        }
+
+        button4.setOnClickListener {
+            Toast.makeText(this, LatLng(19.133081, 72.913458)
+                    .distanceTo(LatLng(19.135400, 72.909873))
+                    .toString(), Toast.LENGTH_SHORT)
+                    .show()
+        }
+
+        startButton.setOnClickListener {
+            active = 1
+        }
+
+        breakButton.setOnClickListener {
+
+            active = 0
+
+            val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+            val lastPatchPoint: Location = locationArray[locationArray.size - 1]
+            val sb = StringBuilder()
+
+            Toast.makeText(this, locationArray.size.toString(), Toast.LENGTH_SHORT).show()
+
+            val default = setOf<String>()
+            var prevPref = setOf<String>()
+
+            if (sharedPreferences.contains("patchArray")){
+                prevPref = sharedPreferences.getStringSet("patchArray", default)
+            }
+
+            for (i in locationArray) {
+                sb.append(i).append(";")
+            }
+
+            if (revisit == 1){
+                sb.append(findRevisitPoint(prevPref, lastPatchPoint)).append(";")
+            }
+
+            sb.dropLast(1)
+
+            prevPref.plus(sb.toString())
+            val sharedPrefEditor =  sharedPreferences.edit()
+
+            sharedPrefEditor.putStringSet("patchArray", prevPref)
+
+            sharedPrefEditor.apply()
+
+            locationArray.clear()
+            locationArray.add(lastPatchPoint)
+        }
+
+        endBotton.setOnClickListener {
+
+            val default = setOf<String>()
+            val patchArray = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+                                                 .getStringSet("patchArray", default)
+
+            val outJsonArr = JsonArray()
+
+            for (patch in patchArray) {
+
+                val locationPoints : List<String> = patch.split(";")
+                val inJsonArr = JsonArray()
+
+//                var count = 0
+//                var prevLatd = 0.0
+//                var prevLongd = 0.0
+
+                for(i in locationPoints) {
+
+                    val latd = i.substring(15, 24).toDouble()
+                    val longd = i.substring(25, 34).toDouble()
+
+                    val json = JsonObject()
+
+                    json.addProperty("lat", latd)
+                    json.addProperty("long", longd)
+
+                    inJsonArr.add(json)
+
+//                    if(count > 0){
+//                        val lineSegment = ArrayList<LatLng>()
+//                        lineSegment.add(LatLng(prevLatd, prevLongd))
+//                        lineSegment.add(LatLng(latd, longd))
+//                        mapboxMap.addPolyline(PolylineOptions()
+//                                .addAll(lineSegment)
+//                                .color(Color.parseColor("#3895D3"))
+//                                .width(5f))
+//                    }
+
+//                    count += 1
+//                    prevLatd = latd
+//                    prevLongd = longd
+                }
+
+                outJsonArr.add(inJsonArr)
+            }
+
+            val pathJson = JsonObject()
+            pathJson.add("path_segment", outJsonArr)
+
+        }
 
         my_location.setOnClickListener {
 
@@ -67,8 +185,6 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
         cardView.setOnClickListener {
 
         }
-
-
 
         loadMap(savedInstanceState)
     }
@@ -131,7 +247,12 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             for(i in 0..(places.length()-1))
             {
                 val place = places.getJSONObject(i)
-                placeMarker(mapboxMap, place.getDouble("lat"), place.getDouble("long"), place.getString("name"))
+                placeMarker(
+                        mapboxMap,
+                        place.getDouble("lat"),
+                        place.getDouble("long"),
+                        place.getString("name")
+                )
             }
 
             //placeMarker(mapboxMap, 19.1334, 72.9133, "IITB")
@@ -172,7 +293,7 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
     @SuppressLint("MissingPermission")
     private fun enableLocationComponent() {
-        Toast.makeText(this, "Entered enableLocationComponent", Toast.LENGTH_LONG).show()
+//        Toast.makeText(this, "Entered enableLocationComponent", Toast.LENGTH_LONG).show()
 
         if(PermissionsManager.areLocationPermissionsGranted(this)) {
             val options = LocationComponentOptions.builder(this)
@@ -193,7 +314,7 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             locationComponent?.renderMode = RenderMode.COMPASS
             locationComponent?.tiltWhileTracking(0.0)
             originLocation = locationComponent?.lastKnownLocation
-            Toast.makeText(this, originLocation.toString(), Toast.LENGTH_LONG).show()
+//            Toast.makeText(this, originLocation.toString(), Toast.LENGTH_LONG).show()
 
             locationEngine = LocationEngineProvider(this).obtainBestLocationEngineAvailable()
             locationEngine?.activate()
@@ -224,26 +345,30 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
     @SuppressLint("MissingPermission")
     override fun onConnected() {
+//        lastPatchPoint = locationEngine?.lastLocation!!
         Toast.makeText(this, "Connected!!", Toast.LENGTH_LONG).show()
         locationEngine?.requestLocationUpdates()
     }
 
-    override fun onLocationChanged(location: Location?) {
-//        Toast.makeText(this, location.toString(), Toast.LENGTH_LONG).show()
+    override fun onLocationChanged(location: Location) {
+        if(active == 1) {
+            locationArray.add(location)
+        }
+
+//        val locationStr = "Latitude : " + location.latitude.toString() +
+//                "\nLongitude : " + location.longitude.toString() +
+//                "\nAccuracy : " + location.accuracy.toString() +
+//                "\nTime : " + location.time.toString()
+//
+//        Toast.makeText(this, locationStr, Toast.LENGTH_LONG).show()
+
     }
 
     private fun placeMarker(mapboxMap: MapboxMap, lat: Double, lon: Double, title: String){
         mapboxMap.addMarker(MarkerOptions()
                 .position(LatLng(lat, lon))
-                .title(title)
-        )
+                .title(title))
     }
-
-    /*
-    private fun drawPolyLine(mapboxMap: MapboxMap,
-    */
-
-
 
     override fun onResume(){
         super.onResume()
@@ -305,4 +430,29 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             cardView.visibility = View.GONE
         }
     }
+
+    private fun findRevisitPoint(prevRef : Set<String>, lastPatchPoint : Location) : String{
+        var returnStr = ""
+        var min = 500.0
+
+        for (patch in prevRef) {
+            val locationPoints : List<String> = patch.split(";")
+            val i = locationPoints[0]
+            val latd = i.substring(15, 24).toDouble()
+            val longd = i.substring(25, 34).toDouble()
+
+            Toast.makeText(this, LatLng(19.133081, 72.913458)
+                    .distanceTo(LatLng(19.135400, 72.909873))
+                    .toString(), Toast.LENGTH_SHORT)
+                    .show()
+
+            if (LatLng(latd, longd).distanceTo(LatLng(lastPatchPoint.latitude, lastPatchPoint.longitude)) < min){
+                min = LatLng(latd, longd).distanceTo(LatLng(lastPatchPoint.latitude, lastPatchPoint.longitude))
+                returnStr = i
+            }
+        }
+
+        return returnStr
+    }
+
 }
