@@ -14,6 +14,10 @@ import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
 import android.widget.Toast
+import com.android.volley.Request
+import com.android.volley.Response
+import com.android.volley.toolbox.JsonObjectRequest
+import com.android.volley.toolbox.Volley
 import com.google.gson.JsonArray
 import com.google.gson.JsonObject
 import com.mapbox.android.core.location.LocationEngine
@@ -196,6 +200,8 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             val pathJson = JsonObject()
             pathJson.add("path_segment", outJsonArr)
 
+            sendData(pathJson)
+
         }
 
         index = mutableMapOf<Int, Int>()
@@ -230,7 +236,7 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             //if(mylocation)
             //cardView.card_trek_place.text
             if(mylocation != null){
-                drawLine(mapboxMap!!, mylocation!!, LatLng(pressedMarker!!.position.latitude, pressedMarker!!.position.longitude))
+//                drawLine(mapboxMap!!, mylocation!!, LatLng(pressedMarker!!.position.latitude, pressedMarker!!.position.longitude))
                 Toast.makeText(this, pressedMarker!!.title, Toast.LENGTH_LONG).show()
             }
             else{
@@ -254,63 +260,63 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
 
 
-    fun drawLine(mapboxMap: MapboxMap, spoint: LatLng, epoint: LatLng){
-        var minDistance = 2345678.0
-        var minIndex = 1
-        for(i in 0..(index.size-1)){
-            var curDis = spoint.distanceTo(latlng[i+1])
-            if(curDis < minDistance){
-                minDistance = curDis
-                minIndex = i + 1
-            }
-        }
-        var minDistance2 = 2345678.0
-        var minIndex2 = 1
-        for(i in 0..(index.size-1)){
-            var curDis = epoint.distanceTo(latlng[i+1])
-            if(curDis < minDistance2){
-                minDistance2 = curDis
-                minIndex2 = i + 1
-            }
-        }
-
-        var vis = IntArray(index.size + 1)
-        var dist = DoubleArray(index.size + 1)
-        var parent = IntArray(index.size + 1)
-        latlng[0] = spoint
-        var queue: PriorityQueue<Pair<Double, Pair<Int, Int>>> = PriorityQueue<Pair<Double, Pair<Int, Int>>>(compareBy({it.first}))
-        queue.add(Pair(minDistance, Pair(minIndex, 0)))
-        while (queue.isNotEmpty()){
-            var top = queue.remove()
-            if(vis[top.second.first]==1){
-                continue
-            }
-            vis[top.second.first]=1
-            dist[top.second.first]=top.first
-            parent[top.second.first]=top.second.second
-            for(i in 0..(adj[top.second.first]!!.size - 1)){
-                queue.add(Pair(top.first+adj[top.second.first]!![i].second,Pair(adj[top.second.first]!![i].first,top.second.first)))
-            }
-        }
-        var path = ArrayList<LatLng>()
-        var found = 0
-        var curPoint = minIndex2
-        while(found == 0){
-            path.add(latlng[curPoint]!!)
-            Log.i("Adding point id:", curPoint.toString())
-            if(curPoint == 0){
-                found = 1
-            }
-            curPoint = parent[curPoint]
-        }
-        if(directionsLine != null){
-            directionsLine?.remove()
-        }
-        directionsLine = mapboxMap.addPolyline(PolylineOptions()
-                .addAll(path)
-                .color(Color.parseColor("#ED2939"))
-                .width(5f))
-    }
+//    fun drawLine(mapboxMap: MapboxMap, spoint: LatLng, epoint: LatLng){
+//        var minDistance = 2345678.0
+//        var minIndex = 1
+//        for(i in 0..(index.size-1)){
+//            var curDis = spoint.distanceTo(latlng[i+1])
+//            if(curDis < minDistance){
+//                minDistance = curDis
+//                minIndex = i + 1
+//            }
+//        }
+//        var minDistance2 = 2345678.0
+//        var minIndex2 = 1
+//        for(i in 0..(index.size-1)){
+//            var curDis = epoint.distanceTo(latlng[i+1])
+//            if(curDis < minDistance2){
+//                minDistance2 = curDis
+//                minIndex2 = i + 1
+//            }
+//        }
+//
+//        var vis = IntArray(index.size + 1)
+//        var dist = DoubleArray(index.size + 1)
+//        var parent = IntArray(index.size + 1)
+//        latlng[0] = spoint
+//        var queue: PriorityQueue<Pair<Double, Pair<Int, Int>>> = PriorityQueue<Pair<Double, Pair<Int, Int>>>(compareBy({it.first}))
+//        queue.add(Pair(minDistance, Pair(minIndex, 0)))
+//        while (queue.isNotEmpty()){
+//            var top = queue.remove()
+//            if(vis[top.second.first]==1){
+//                continue
+//            }
+//            vis[top.second.first]=1
+//            dist[top.second.first]=top.first
+//            parent[top.second.first]=top.second.second
+//            for(i in 0..(adj[top.second.first]!!.size - 1)){
+//                queue.add(Pair(top.first+adj[top.second.first]!![i].second,Pair(adj[top.second.first]!![i].first,top.second.first)))
+//            }
+//        }
+//        var path = ArrayList<LatLng>()
+//        var found = 0
+//        var curPoint = minIndex2
+//        while(found == 0){
+//            path.add(latlng[curPoint]!!)
+//            Log.i("Adding point id:", curPoint.toString())
+//            if(curPoint == 0){
+//                found = 1
+//            }
+//            curPoint = parent[curPoint]
+//        }
+//        if(directionsLine != null){
+//            directionsLine?.remove()
+//        }
+//        directionsLine = mapboxMap.addPolyline(PolylineOptions()
+//                .addAll(path)
+//                .color(Color.parseColor("#ED2939"))
+//                .width(5f))
+//    }
 
     fun loadMap(savedInstanceState: Bundle?){
 
@@ -584,14 +590,8 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
     fun displayPlaceInfo(){
         val loginIntent = Intent(this, PlaceInfo::class.java)
-        intent.putExtra("place", card_trek_place.text)
+        intent.putExtra("place", pressedMarker?.title)
         startActivity(loginIntent)
-    }
-
-    fun getDirections(){
-
-//        val location = LocationEngine.
-
     }
 
     fun showAdminAlert(){
@@ -629,5 +629,30 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
         builder.setCancelable(false)
         builder.create().show()
+    }
+
+    fun sendData(json : JsonObject){
+
+        val url = GlobalVariables().sendTrekData
+
+        val finalUrl = "$url?data=$json"
+
+        val requestQueue = Volley.newRequestQueue(this)
+
+        val jsonRequest = JsonObjectRequest(Request.Method.GET, url, null, Response.Listener<JSONObject>{ response ->
+
+            if (response.getString("status") == "true"){
+                Toast.makeText(this, "Success sending trek data", Toast.LENGTH_SHORT).show()
+            }
+            else{
+                Toast.makeText(this, "Error in database", Toast.LENGTH_SHORT).show()
+            }
+
+        }, Response.ErrorListener {
+
+            Toast.makeText(this, "Error Connecting to server", Toast.LENGTH_SHORT).show()
+        })
+
+        requestQueue.add(jsonRequest)
     }
 }
