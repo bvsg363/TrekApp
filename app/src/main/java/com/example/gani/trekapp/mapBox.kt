@@ -8,6 +8,10 @@ import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
 import android.util.Log
+import android.view.View
+import android.view.View.GONE
+import android.view.View.VISIBLE
+import com.google.android.gms.maps.CameraUpdateFactory
 import android.widget.Toast
 import com.google.gson.JsonArray
 import com.google.gson.JsonElement
@@ -18,6 +22,7 @@ import com.mapbox.android.core.location.LocationEngineProvider
 import com.mapbox.android.core.permissions.PermissionsListener
 import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
+import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
 import com.mapbox.mapboxsdk.annotations.PolylineOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
@@ -171,25 +176,37 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
         }
 
+        my_location.setOnClickListener {
+
+        }
+
+        card_get_directions.setOnClickListener {
+            Toast.makeText(this, "hi", Toast.LENGTH_SHORT).show()
+        }
+
+        cardView.setOnClickListener {
+
+        }
+
+
+
+        loadMap(savedInstanceState)
+    }
+
+    fun loadMap(savedInstanceState: Bundle?){
+
         mapView1.onCreate(savedInstanceState)
 
+
         val latLngBounds = LatLngBounds.Builder()
-                //.include(LatLng(37.7897, -119.5073)) // Northeast
-                //.include(LatLng(37.6744, -119.6815)) // Southwest
                 //.include(LatLng(19.144813, 72.920681)) // Northeast
                 //.include(LatLng(19.136674, 72.913977)) // Southwest
-                //.include(LatLng(23.36, 85.335)) // Northeast
-                //.include(LatLng(23.31, 85.284)) // Southwest
                 .include(LatLng(trekInfo?.getDouble("ne-lat")!!, trekInfo?.getDouble("ne-long")!!)) // Northeast
-//                .include(LatLng(trekInfo?.getDouble("sw-lat")!!, trekInfo?.getDouble("sw-long")!!)) // Southwest
-                .include(LatLng(19.129620, 72.906856))
+                .include(LatLng(trekInfo?.getDouble("sw-lat")!!, trekInfo?.getDouble("sw-long")!!)) // Southwest
                 .build()
 
-//        mapView1.set
-//        mapView1
-
         mapView1.getMapAsync{
-//            it.uiSettings.setAllGesturesEnabled(false)
+            //            it.uiSettings.setAllGesturesEnabled(false)
             it.setMaxZoomPreference(19.0)
             it.setMinZoomPreference(16.0)
             it.setLatLngBoundsForCameraTarget(latLngBounds)
@@ -213,8 +230,19 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             //        .position(LatLng(19.1334, 72.9133))
             //        .title("IITB"))
 
+            mapboxMap.setOnMarkerClickListener {marker ->
+                onPlaceSelect(marker)
+//                Toast.makeText(this, marker.title, Toast.LENGTH_SHORT).show()
+                true
+            }
+
+            mapboxMap.addOnMapClickListener {
+                disableCard()
+            }
+
             val start_arr = trekInfo?.getJSONArray("start_points")!!
             val start_point = start_arr.getJSONObject(0)
+
             mapboxMap.addMarker(MarkerOptions()
                     .position(LatLng(start_point.getDouble("lat"), start_point.getDouble("long")))
                     .title("Start point"))
@@ -244,35 +272,6 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
                         .color(Color.parseColor("#3895D3"))
                         .width(5f))
             }
-//
-//            var locationPoints : List<String> = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
-//                    .getString("locationArray", "")
-//                    .split(";")
-//            locationPoints = locationPoints.dropLast(1)
-//
-//            var count = 0
-//            var prevLatd = 0.0
-//            var prevLongd = 0.0
-//            for(i in locationPoints) {
-//                Log.i("testing1", count.toString())
-//                val latd = i.substring(15, 24).toDouble()
-//                Log.i("testing2", "2")
-//                val longd = i.substring(25, 34).toDouble()
-//                if(count > 0){
-//                    val lineSegment = ArrayList<LatLng>()
-//                    lineSegment.add(LatLng(prevLatd, prevLongd))
-//                    lineSegment.add(LatLng(latd, longd))
-//                    mapboxMap.addPolyline(PolylineOptions()
-//                            .addAll(lineSegment)
-//                            .color(Color.parseColor("#3895D3"))
-//                            .width(5f))
-//                }
-//                count += 1
-//                prevLatd = latd
-//                prevLongd = longd
-//            }
-//
-//
             //mapboxMap.addPolyline(PolylineOptions()
             //        .addAll(polygonLatLongList)
             //        .color(Color.BLUE)
@@ -285,7 +284,7 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             val center_lat = (trekInfo?.getDouble("ne-lat")!! + trekInfo?.getDouble("sw-lat")!!)/2
             val center_long = (trekInfo?.getDouble("ne-long")!! + trekInfo?.getDouble("sw-long")!!)/2
             val position: CameraPosition = CameraPosition.Builder()
-                    .target(LatLng(center_lat, center_long))
+                    .target(LatLng(19.141181, 72.918032))
                     .zoom(17.0)
                     .bearing(0.0)
                     .tilt(30.0)
@@ -293,11 +292,6 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             mapboxMap.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 7000)
         }
 
-        //mapView.getMapAsync(
-        //)
-        //mapView.getMapAsync({
-        //   it.setStyle(Style.SATELLITE)
-        //})
     }
 
 
@@ -420,6 +414,25 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
     override fun onSaveInstanceState(outState: Bundle) {
         super.onSaveInstanceState(outState)
         mapView1.onSaveInstanceState(outState)
+    }
+
+    fun onPlaceSelect(marker: Marker){
+
+        if (cardView.visibility.equals(GONE)){
+            cardView.visibility = View.VISIBLE
+        }
+//        else{
+//            cardView.visibility = View.GONE
+//        }
+
+        card_trek_place.text = marker.title
+        card_trek_info.text = "Hey this is a cool place"
+    }
+
+    fun disableCard(){
+        if (cardView.visibility.equals(VISIBLE)){
+            cardView.visibility = View.GONE
+        }
     }
 
     private fun findRevisitPoint(prevRef : Set<String>, lastPatchPoint : Location) : String{
