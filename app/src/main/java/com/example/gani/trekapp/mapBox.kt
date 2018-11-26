@@ -11,10 +11,8 @@ import android.util.Log
 import android.view.View
 import android.view.View.GONE
 import android.view.View.VISIBLE
-import com.google.android.gms.maps.CameraUpdateFactory
 import android.widget.Toast
 import com.google.gson.JsonArray
-import com.google.gson.JsonElement
 import com.google.gson.JsonObject
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
@@ -187,8 +185,6 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
         cardView.setOnClickListener {
 
         }
-
-
 
         loadMap(savedInstanceState)
     }
