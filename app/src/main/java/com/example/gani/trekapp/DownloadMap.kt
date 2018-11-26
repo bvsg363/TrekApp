@@ -326,7 +326,7 @@ class DownloadMap : AppCompatActivity() {
                 saveTrekData(response)
                 if(downloadMap){
                     if(calcBound){
-                        Toast.makeText(this, trekData?.toString(), Toast.LENGTH_LONG).show()
+//                        Toast.makeText(this, trekData?.toString(), Toast.LENGTH_LONG).show()
                         val Latmin = trekData?.getDouble("sw-lat")!!
                         val Lonmin = trekData?.getDouble("sw-long")!!
                         val Latmax = trekData?.getDouble("ne-lat")!!

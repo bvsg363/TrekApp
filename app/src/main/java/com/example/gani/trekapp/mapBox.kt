@@ -1,12 +1,14 @@
 package com.example.gani.trekapp
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.content.Context
 import android.graphics.Color
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import android.support.v4.content.ContextCompat
+import android.support.v7.app.AlertDialog
 import android.util.Log
 import android.view.View
 import android.view.View.GONE
@@ -74,6 +76,9 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
         trekInfo = JSONObject(file.readText())
 //        Log.i("mapBox The file content", file.readText())
 
+        showAdminAlert()
+
+
         val arr : List<String> = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
                 .getString("locationArray", "")
                 .split(";")
@@ -83,13 +88,13 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
                 Log.i("mapBox1", i)
             }
         }
-/*
-        button4.setOnClickListener {
-            Toast.makeText(this, LatLng(19.133081, 72.913458)
-                    .distanceTo(LatLng(19.135400, 72.909873))
-                    .toString(), Toast.LENGTH_SHORT)
-                    .show()
-        }*/
+
+//        button4.setOnClickListener {
+//            Toast.makeText(this, LatLng(19.133081, 72.913458)
+//                    .distanceTo(LatLng(19.135400, 72.909873))
+//                    .toString(), Toast.LENGTH_SHORT)
+//                    .show()
+//        }
 
         startButton.setOnClickListener {
             active = 1
@@ -100,10 +105,18 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             active = 0
 
             val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
-            val lastPatchPoint: Location = locationArray[locationArray.size - 1]
-            val sb = StringBuilder()
 
-            Toast.makeText(this, locationArray.size.toString(), Toast.LENGTH_SHORT).show()
+
+            if(locationArray.size <= 0){
+
+                Toast.makeText(this, "No locations recorded, press START", Toast.LENGTH_SHORT).show()
+                return@setOnClickListener
+            }
+
+            showRevisitPointAlert()
+
+            val lastPatchPoint = locationArray[locationArray.size - 1]
+            val sb = StringBuilder()
 
             val default = setOf<String>()
             var prevPref = setOf<String>()
@@ -208,6 +221,8 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
         my_location.setOnClickListener {
 
+
+
         }
 
         card_get_directions.setOnClickListener {
@@ -221,12 +236,20 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             else{
                 Toast.makeText(this, "Please Enable Location", Toast.LENGTH_SHORT)
             }
+//            Toast.makeText(this, "hi", Toast.LENGTH_SHORT).show()
+//            getDirections()
         }
         cardView.setOnClickListener {
 
         }
 
+        card_get_info.setOnClickListener {
+            displayPlaceInfo()
+        }
+
         loadMap(savedInstanceState)
+
+
     }
 
 
@@ -291,6 +314,8 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
     fun loadMap(savedInstanceState: Bundle?){
 
+        Log.i("mapBox", "loadmap called")
+
         mapView1.onCreate(savedInstanceState)
 
 
@@ -300,13 +325,6 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
                 .include(LatLng(trekInfo?.getDouble("ne-lat")!!, trekInfo?.getDouble("ne-long")!!)) // Northeast
                 .include(LatLng(trekInfo?.getDouble("sw-lat")!!, trekInfo?.getDouble("sw-long")!!)) // Southwest
                 .build()
-
-        mapView1.getMapAsync{
-            //            it.uiSettings.setAllGesturesEnabled(false)
-            it.setMaxZoomPreference(19.0)
-            it.setMinZoomPreference(16.0)
-            it.setLatLngBoundsForCameraTarget(latLngBounds)
-        }
 
 //        val polygonLatLongList = ArrayList<LatLng>()
 //        polygonLatLongList.add(LatLng(19.130, 72.910))
@@ -318,6 +336,10 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
         mapView1.getMapAsync {
             mapboxMap ->
+
+            mapboxMap.setMaxZoomPreference(19.0)
+            mapboxMap.setMinZoomPreference(16.0)
+            mapboxMap.setLatLngBoundsForCameraTarget(latLngBounds)
 
             this@mapBox.mapboxMap = mapboxMap
             enableLocationComponent()
@@ -379,13 +401,14 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             //mapboxMap.animateCamera(CameraUpdateFactory.newLatLngBounds(latLngBounds, 0))
             val center_lat = (trekInfo?.getDouble("ne-lat")!! + trekInfo?.getDouble("sw-lat")!!)/2
             val center_long = (trekInfo?.getDouble("ne-long")!! + trekInfo?.getDouble("sw-long")!!)/2
+
             val position: CameraPosition = CameraPosition.Builder()
-                    .target(LatLng(19.141181, 72.918032))
+                    .target(latLngBounds.center)
                     .zoom(17.0)
                     .bearing(0.0)
                     .tilt(30.0)
                     .build()
-            mapboxMap.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 7000)
+            mapboxMap.animateCamera(com.mapbox.mapboxsdk.camera.CameraUpdateFactory.newCameraPosition(position), 4000)
         }
 
     }
@@ -410,9 +433,9 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             val locationComponent = mapboxMap?.locationComponent
             locationComponent?.activateLocationComponent(this, options)
             locationComponent?.isLocationComponentEnabled = true
-            locationComponent?.cameraMode = CameraMode.TRACKING_GPS_NORTH
+//            locationComponent?.cameraMode = CameraMode.TRACKING_GPS_NORTH
             locationComponent?.renderMode = RenderMode.COMPASS
-            locationComponent?.tiltWhileTracking(0.0)
+//            locationComponent?.tiltWhileTracking(0.0)
             originLocation = locationComponent?.lastKnownLocation
 //            Toast.makeText(this, originLocation.toString(), Toast.LENGTH_LONG).show()
 
@@ -558,4 +581,53 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
         return returnStr
     }
 
+
+    fun displayPlaceInfo(){
+        val loginIntent = Intent(this, PlaceInfo::class.java)
+        intent.putExtra("place", card_trek_place.text)
+        startActivity(loginIntent)
+    }
+
+    fun getDirections(){
+
+//        val location = LocationEngine.
+
+    }
+
+    fun showAdminAlert(){
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Admin Verification")
+
+        builder.setMessage("Are u an admin?")
+
+        builder.setPositiveButton("Yes"){_, _ ->
+            admin_layout.visibility = View.VISIBLE
+        }
+
+        builder.setNegativeButton("No"){_, _ ->
+            admin_layout.visibility = View.INVISIBLE
+        }
+
+        builder.setCancelable(false)
+        builder.create().show()
+    }
+
+    fun showRevisitPointAlert(){
+
+        val builder = AlertDialog.Builder(this)
+        builder.setTitle("Resivit verification")
+
+        builder.setMessage("Have you been here before?")
+
+        builder.setPositiveButton("Yes"){_, _ ->
+            revisit = 1
+        }
+
+        builder.setNegativeButton("No"){_, _ ->
+        }
+
+        builder.setCancelable(false)
+        builder.create().show()
+    }
 }

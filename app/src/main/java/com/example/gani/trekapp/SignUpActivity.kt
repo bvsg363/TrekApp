@@ -41,9 +41,36 @@ class SignUpActivity : AppCompatActivity() {
 
     private fun sendGetVolleySignup(emailId : String, password: String, username: String){
         val url = GlobalVariables().signUpUrl
-
-        val finalUrl = "$url?email=$emailId&password=$password&user_name=$username&verified=0"
-
+        var query=""
+        var brk="043"
+        var z="0"
+        for(c in emailId){
+            var s=c.toInt().toString()
+            while(s.length <3){
+                s=z+s
+            }
+            query=query+s
+        }
+        query=query+brk
+        for(c in password){
+            var s=c.toInt().toString()
+            while(s.length <3){
+                s=z+s
+            }
+            query=query+s
+        }
+        query=query+brk
+        for(c in username){
+            var s=c.toInt().toString()
+            while(s.length <3){
+                s=z+s
+            }
+            query=query+s
+        }
+        query+=brk
+        query+="048"
+//        val finalUrl = "$url?email=$emailId&password=$password&user_name=$username&verified=0"
+        val finalUrl = "$url?query=$query"
         val requestQueue = Volley.newRequestQueue(this)
 
 
