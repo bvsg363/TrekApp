@@ -76,15 +76,15 @@ class DownloadMap : AppCompatActivity() {
             start_button.visibility = View.INVISIBLE
         }
 
-        downloadImage()
+        //downloadImage()
 
-        var imgFile = File(imageFile)
+        /*var imgFile = File(imageFile)
         if(imgFile.exists()){
             var imgStr = imgFile.readText()
             //Toast.makeText(this, imgStr, Toast.LENGTH_LONG).show()
             //var bitmap: Bitmap? = BitmapFactory.decodeFile(imgFile.absolutePath)!!
             //imageView.setImageBitmap(bitmap)
-        }
+        }*/
 
         start_button.setOnClickListener {
             getTrekData(true, false, false)
@@ -225,7 +225,7 @@ class DownloadMap : AppCompatActivity() {
         )
     }
 
-    private fun downloadImage(){
+/*    private fun downloadImage(){
         val url = GlobalVariables().trekImageUrl
         val finalUrl = "$url?trek_id=$trekId"
         val requestQueue = Volley.newRequestQueue(this)
@@ -241,12 +241,16 @@ class DownloadMap : AppCompatActivity() {
 
                 var stringRec: String = response.getString("img_data")
                 Log.i("originalDAta: ", stringRec)
-                stringRec.replace("data:image/jpg;base64,", "").replace("data:image/jpeg;base64,", "")
-                var decodedString: ByteArray = Base64.decode(stringRec, Base64.URL_SAFE)
-                Log.i("ByteArray", decodedString.toString())
-                //var bitmap: Bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size)
+//                stringRec.replace("data:image/jpg;base64,", "").replace("data:image/jpeg;base64,", "")
+                var decodedString: ByteArray= Base64.decode(stringRec, Base64.URL_SAFE)
 
-                //imageView.setImageBitmap(bitmap)
+                //for(i in 0..(decodedString.size - 1)) {
+                //Log.i("ByteArray", decodedString.toString(Charsets.UTF_8))
+
+                //Glide.with
+//                var bitmap: Bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size - 1)
+
+//                imageView.setImageBitmap(bitmap)
 //                imgFile.writeText(response.getString("img_data").toString())
 //                    displayTreks(response)
                 //var bitmap: Bitmap = BitmapFactory.decodeByteArray(response.getString("img_data").toByteArray(),0,response.getString("img_data").toByteArray().size)
@@ -301,7 +305,7 @@ class DownloadMap : AppCompatActivity() {
         })
 
         requestQueue.add(jsonRequest)
-    }
+    }*/
 
     private fun getTrekData(gotoMapFlag: Boolean, downloadMap: Boolean, calcBound: Boolean, latmin: Double=0.0, lonmin: Double=0.0, latmax: Double=0.0, lonmax: Double=0.0):Boolean{
 
