@@ -83,13 +83,13 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
                 Log.i("mapBox1", i)
             }
         }
-
+/*
         button4.setOnClickListener {
             Toast.makeText(this, LatLng(19.133081, 72.913458)
                     .distanceTo(LatLng(19.135400, 72.909873))
                     .toString(), Toast.LENGTH_SHORT)
                     .show()
-        }
+        }*/
 
         startButton.setOnClickListener {
             active = 1
