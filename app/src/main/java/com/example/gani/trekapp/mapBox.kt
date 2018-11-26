@@ -39,6 +39,7 @@ import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import kotlinx.android.synthetic.main.activity_map_box.*
 import kotlinx.android.synthetic.main.activity_map_box.view.*
+import org.json.JSONArray
 import org.json.JSONObject
 import java.io.File
 import java.util.*
@@ -58,6 +59,8 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
     private var latlng: MutableMap<Int, LatLng> = mutableMapOf<Int, LatLng>()
     private var mylocation: LatLng? = null
     private var pressedMarker: Marker? = null
+
+    private var placeArray: JsonArray = JsonArray()
 
     private var permissionsManager: PermissionsManager? = null
     private var originLocation: Location? = null
@@ -156,6 +159,8 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
             val patchArray = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
                                                  .getStringSet("patchArray", default)
 
+            val sendJson = JsonObject()
+
             val outJsonArr = JsonArray()
 
             for (patch in patchArray) {
@@ -194,7 +199,35 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 //                    prevLongd = longd
                 }
 
+                var startArr: JsonArray = JsonArray()
+                var individualPatch: JsonArray = outJsonArr[0].asJsonArray
+                startArr.add(individualPatch[0])
                 outJsonArr.add(inJsonArr)
+                sendJson.add("path_segment", outJsonArr)
+                sendJson.add("trek_place", placeArray)
+                sendJson.add("imges", null)
+                sendJson.add("start_points", startArr)
+                sendData(sendJson)
+            }
+
+            addPlace.setOnClickListener{
+                addPlaceConstraint.visibility = View.VISIBLE
+            }
+
+            update.setOnClickListener{
+
+                var place: JsonObject = JsonObject()
+                place.addProperty("place_name", placeName.text.toString())
+                place.addProperty("place_info", placeInfo.text.toString())
+                place.addProperty("country", "India")
+                place.addProperty("lat", mylocation!!.latitude)
+                place.addProperty("long", mylocation!!.longitude)
+                //var placeArray: JSONArray = JSONArray()
+                placeArray.add(place)
+
+                placeName.text = null
+                placeInfo.text = null
+                addPlaceConstraint.visibility = View.GONE
             }
 
             val pathJson = JsonObject()

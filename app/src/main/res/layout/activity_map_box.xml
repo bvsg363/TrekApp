@@ -205,6 +205,7 @@
         android:id="@+id/addPlaceConstraint"
         android:layout_width="match_parent"
         android:layout_height="281dp"
+        android:visibility="gone"
         app:layout_constraintBottom_toBottomOf="@+id/mapView1"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent">
