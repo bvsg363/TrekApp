@@ -10,5 +10,5 @@ class GlobalVariables {
     val treksUrl = "http://$ip:8080/TrekAppServer/GetTreks"
     val trekDataUrl = "http://$ip:8080/TrekAppServer/TrekData"
     val trekImageUrl = "http://$ip:8080/TrekAppServer/TrekImage"
-
+    val sendTrekData = "http://$ip:8080/TrekAppServer/ReceiveTrekData"
 }
