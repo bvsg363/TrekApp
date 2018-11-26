@@ -7,6 +7,102 @@
     android:layout_height="match_parent"
     tools:context=".mapBox">
 
+    <android.support.v7.widget.CardView
+        android:id="@+id/cardView"
+        android:layout_width="match_parent"
+        android:layout_height="160dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginRight="8dp"
+        android:layout_marginBottom="8dp"
+        android:visibility="gone"
+        android:elevation="1dp"
+        app:cardBackgroundColor="@color/cardview_light_background"
+        app:cardCornerRadius="10dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent">
+
+
+        <android.support.constraint.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/card_trek_place"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginLeft="16dp"
+                android:layout_marginTop="8dp"
+                android:text="Trek Place"
+                android:textSize="26sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/card_trek_info"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:paddingLeft="4dp"
+                android:text="Brief info "
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/card_trek_place"
+                app:layout_constraintTop_toBottomOf="@+id/card_trek_place" />
+
+            <TextView
+                android:id="@+id/card_get_info"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginLeft="24dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/rounded_corners"
+                android:padding="10dp"
+                android:text="Get Info"
+                android:textSize="16sp"
+                app:layout_constraintBaseline_toBaselineOf="@+id/card_get_directions"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toEndOf="@+id/card_get_directions" />
+
+            <TextView
+                android:id="@+id/card_get_directions"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:background="@drawable/rounded_corners"
+                android:padding="10dp"
+                android:text="Get Directions"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintHorizontal_bias="0.063"
+                app:layout_constraintTop_toBottomOf="@+id/card_trek_info"
+                mapbox:layout_constraintEnd_toEndOf="parent"
+                mapbox:layout_constraintStart_toStartOf="parent" />
+        </android.support.constraint.ConstraintLayout>
+    </android.support.v7.widget.CardView>
+
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/my_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        app:backgroundTint="@color/colorAccent"
+        app:layout_constraintBottom_toTopOf="@+id/cardView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.916"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.9"
+        app:rippleColor="@color/common_google_signin_btn_text_dark_default"
+        mapbox:srcCompat="@android:drawable/ic_menu_mylocation" />
+
     <com.mapbox.mapboxsdk.maps.MapView
         android:id="@+id/mapView1"
         android:layout_width="match_parent"
@@ -15,7 +111,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        mapbox:mapbox_styleUrl="@string/mapBox_styleUrl_satellite"/>
+        mapbox:mapbox_styleUrl="@string/mapBox_styleUrl_satellite">
+
+    </com.mapbox.mapboxsdk.maps.MapView>
         <!--mapbox:mapbox_cameraTargetLat="19.140282"
         mapbox:mapbox_cameraTargetLng="72.917668"
         mapbox:mapbox_styleUrl="@string/mapBox_styleUrl_satellite"
