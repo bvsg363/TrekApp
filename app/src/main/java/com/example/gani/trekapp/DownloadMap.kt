@@ -2,8 +2,11 @@ package com.example.gani.trekapp
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import android.util.Base64
 import android.util.Log
 import android.view.View
 import android.widget.ProgressBar
@@ -29,6 +32,7 @@ import kotlinx.android.synthetic.main.activity_download_map.*
 
 import org.json.JSONObject
 import java.io.File
+import java.nio.charset.Charset
 
 /**
  * Download and view an offline map using the Mapbox Android SDK.
@@ -38,9 +42,11 @@ class DownloadMap : AppCompatActivity() {
     private var isEndNotified: Boolean = false
     private var trekName: String? = null
     private var fileName: String? = null
+    private var imageFile: String? = null
     private var trekId: String? = null
     private var progressBar: ProgressBar? = null
     private var trekData: JSONObject? = null
+    private var trekImageJ: JSONObject? = null
 
     private var offlineManager: OfflineManager? = null
 
@@ -49,6 +55,7 @@ class DownloadMap : AppCompatActivity() {
 
         trekId = intent.getStringExtra("trekId")          // At present sending the id as a string
         fileName = "${filesDir}/trekData_$trekId"
+        imageFile = "${filesDir}/trekImge_$trekId.jpg"
 
 
         // Mapbox access token is configured here. This needs to be called either in your application
@@ -68,6 +75,17 @@ class DownloadMap : AppCompatActivity() {
         if(!file.exists()){
             start_button.visibility = View.INVISIBLE
         }
+
+        //downloadImage()
+
+        /*var imgFile = File(imageFile)
+        if(imgFile.exists()){
+            var imgStr = imgFile.readText()
+            //Toast.makeText(this, imgStr, Toast.LENGTH_LONG).show()
+            //var bitmap: Bitmap? = BitmapFactory.decodeFile(imgFile.absolutePath)!!
+            //imageView.setImageBitmap(bitmap)
+        }*/
+
         start_button.setOnClickListener {
             getTrekData(true, false, false)
         }
@@ -207,10 +225,87 @@ class DownloadMap : AppCompatActivity() {
         )
     }
 
-    //private fun downloadImage(){
-    //    val url = GlobalVariables().trekImageUrl
+/*    private fun downloadImage(){
+        val url = GlobalVariables().trekImageUrl
+        val finalUrl = "$url?trek_id=$trekId"
+        val requestQueue = Volley.newRequestQueue(this)
+        val jsonRequest = JsonObjectRequest(Request.Method.GET, finalUrl, null, Response.Listener<JSONObject>{ response ->
 
-    //}
+            print(response)
+            trekImageJ = response
+            Log.i("TrekImage", response.getString("status"))
+
+            if (response.getString("status") == "success"){
+                //Toast.makeText(this, imageFile, Toast.LENGTH_SHORT).show()
+                var imgFile = File(imageFile)
+
+                var stringRec: String = response.getString("img_data")
+                Log.i("originalDAta: ", stringRec)
+//                stringRec.replace("data:image/jpg;base64,", "").replace("data:image/jpeg;base64,", "")
+                var decodedString: ByteArray= Base64.decode(stringRec, Base64.URL_SAFE)
+
+                //for(i in 0..(decodedString.size - 1)) {
+                //Log.i("ByteArray", decodedString.toString(Charsets.UTF_8))
+
+                //Glide.with
+//                var bitmap: Bitmap = BitmapFactory.decodeByteArray(decodedString, 0, decodedString.size - 1)
+
+//                imageView.setImageBitmap(bitmap)
+//                imgFile.writeText(response.getString("img_data").toString())
+//                    displayTreks(response)
+                //var bitmap: Bitmap = BitmapFactory.decodeByteArray(response.getString("img_data").toByteArray(),0,response.getString("img_data").toByteArray().size)
+                //var imgReadFile = File(imageFile)
+                /*var hexString = response.getString("img_data")
+                val string: CharArray = CharArray((hexString.length-3)/2)
+                for(i in 3..(hexString.length - 1))
+                {
+                    if(i % 2 == 0){
+                        if(i > 2){
+                            var char1 = hexString.get(i-1)
+                            var char2 = hexString.get(i)
+                            var byteData: String = "$char1$char2"
+                            //Log.i("the string : ", byteData)
+                            //Log.i("The number is", Integer.parseInt(byteData, 16).toString())
+
+                            var ch = Integer.parseInt(byteData, 16).toChar()
+                            //Log.i("The index", byteData.toString())
+                            string[(i/2) - 2] = ch
+                        }
+                    }
+                }
+                Toast.makeText(this, string.toString(), Toast.LENGTH_SHORT).show()
+                Log.i("the image data ******", string.size.toString())
+                Log.i("the image data ******", string.toString())
+                imgFile.writeText(string.toString(), Charsets.US_ASCII)*/
+                //var charData = hexString.toCharArray()
+                //var data: ByteArray = response.getString("img_data").toByteArray()
+                //var data: ByteArray = string.toString().toByteArray()
+                //Toast.makeText(this, data.size.toString(), Toast.LENGTH_LONG)
+//                var bitmap: Bitmap = BitmapFactory.decodeFile(imageFile)
+                //var bitmap: Bitmap = BitmapFactory.decodeByteArray(data, 0, data.size)
+
+            }
+            else{
+
+//                Toast.makeText(this, response.getString("message"), Toast.LENGTH_SHORT).show()
+
+                Toast.makeText(this, "Error in database", Toast.LENGTH_SHORT).show()
+
+            }
+
+        }, Response.ErrorListener {
+            //val sharedPreferences = getSharedPreferences("TrekApp", Context.MODE_PRIVATE)
+
+            Toast.makeText(this, "Error Connecting to server for Trek_image", Toast.LENGTH_SHORT).show()
+
+            //if (sharedPreferences.contains("treksAvailable")) {
+            //displayTreks(JSONObject(sharedPreferences.getString("treksAvailable", "")))
+
+            //}
+        })
+
+        requestQueue.add(jsonRequest)
+    }*/
 
     private fun getTrekData(gotoMapFlag: Boolean, downloadMap: Boolean, calcBound: Boolean, latmin: Double=0.0, lonmin: Double=0.0, latmax: Double=0.0, lonmax: Double=0.0):Boolean{
 

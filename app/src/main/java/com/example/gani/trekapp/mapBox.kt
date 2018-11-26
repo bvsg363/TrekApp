@@ -24,6 +24,7 @@ import com.mapbox.android.core.permissions.PermissionsManager
 import com.mapbox.mapboxsdk.Mapbox
 import com.mapbox.mapboxsdk.annotations.Marker
 import com.mapbox.mapboxsdk.annotations.MarkerOptions
+import com.mapbox.mapboxsdk.annotations.Polyline
 import com.mapbox.mapboxsdk.annotations.PolylineOptions
 import com.mapbox.mapboxsdk.camera.CameraPosition
 import com.mapbox.mapboxsdk.geometry.LatLng
@@ -33,8 +34,12 @@ import com.mapbox.mapboxsdk.location.modes.CameraMode
 import com.mapbox.mapboxsdk.location.modes.RenderMode
 import com.mapbox.mapboxsdk.maps.MapboxMap
 import kotlinx.android.synthetic.main.activity_map_box.*
+import kotlinx.android.synthetic.main.activity_map_box.view.*
 import org.json.JSONObject
 import java.io.File
+import java.util.*
+import kotlin.Comparator
+import kotlin.math.sqrt
 
 class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener {
 
@@ -43,6 +48,12 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
     private var trekInfo: JSONObject? = null
     private var fileName: String? = null
     private var trekId: String? = null
+    private var directionsLine: Polyline? = null
+    private var index: MutableMap<Int, Int> = mutableMapOf<Int, Int>()
+    private var adj: MutableMap<Int, MutableList<Pair<Int, Double>>> = mutableMapOf<Int, MutableList<Pair<Int, Double>>>()
+    private var latlng: MutableMap<Int, LatLng> = mutableMapOf<Int, LatLng>()
+    private var mylocation: LatLng? = null
+    private var pressedMarker: Marker? = null
 
     private var permissionsManager: PermissionsManager? = null
     private var originLocation: Location? = null
@@ -187,6 +198,27 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 
         }
 
+        index = mutableMapOf<Int, Int>()
+
+        var cordArr = trekInfo?.getJSONArray("co_ordinates")!!
+        for(i in 0..(cordArr.length()-1)){
+            var id = cordArr.getJSONObject(i).getInt("id")
+            index[i+1] = id
+            latlng[i+1] = LatLng(cordArr.getJSONObject(i).getDouble("lat"), cordArr.getJSONObject(i).getDouble("long"))
+            adj[i+1] = mutableListOf<Pair<Int, Double>>()
+        }
+
+        var paths = trekInfo?.getJSONArray("paths")!!
+        for(i in 0..(paths.length() - 1)){
+            var segment = paths.getJSONObject(i)
+            var first = index[segment.getInt("fco_id")]!!
+            var second = index[segment.getInt("sco_id")]!!
+            var distance = LatLng(segment.getDouble("flat"), segment.getDouble("flong")).distanceTo(LatLng(segment.getDouble("slat"), segment.getDouble("slong")))
+
+            adj[first]!!.add(Pair(second, distance))
+            adj[second]!!.add(Pair(first, distance))
+        }
+
         my_location.setOnClickListener {
 
 
@@ -194,10 +226,19 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
         }
 
         card_get_directions.setOnClickListener {
+            Toast.makeText(this, "hi", Toast.LENGTH_SHORT).show()
+            //if(mylocation)
+            //cardView.card_trek_place.text
+            if(mylocation != null){
+                drawLine(mapboxMap!!, mylocation!!, LatLng(pressedMarker!!.position.latitude, pressedMarker!!.position.longitude))
+                Toast.makeText(this, pressedMarker!!.title, Toast.LENGTH_LONG).show()
+            }
+            else{
+                Toast.makeText(this, "Please Enable Location", Toast.LENGTH_SHORT)
+            }
 //            Toast.makeText(this, "hi", Toast.LENGTH_SHORT).show()
-            getDirections()
+//            getDirections()
         }
-
         cardView.setOnClickListener {
 
         }
@@ -209,6 +250,66 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
         loadMap(savedInstanceState)
 
 
+    }
+
+
+
+    fun drawLine(mapboxMap: MapboxMap, spoint: LatLng, epoint: LatLng){
+        var minDistance = 2345678.0
+        var minIndex = 1
+        for(i in 0..(index.size-1)){
+            var curDis = spoint.distanceTo(latlng[i+1])
+            if(curDis < minDistance){
+                minDistance = curDis
+                minIndex = i + 1
+            }
+        }
+        var minDistance2 = 2345678.0
+        var minIndex2 = 1
+        for(i in 0..(index.size-1)){
+            var curDis = epoint.distanceTo(latlng[i+1])
+            if(curDis < minDistance2){
+                minDistance2 = curDis
+                minIndex2 = i + 1
+            }
+        }
+
+        var vis = IntArray(index.size + 1)
+        var dist = DoubleArray(index.size + 1)
+        var parent = IntArray(index.size + 1)
+        latlng[0] = spoint
+        var queue: PriorityQueue<Pair<Double, Pair<Int, Int>>> = PriorityQueue<Pair<Double, Pair<Int, Int>>>(compareBy({it.first}))
+        queue.add(Pair(minDistance, Pair(minIndex, 0)))
+        while (queue.isNotEmpty()){
+            var top = queue.remove()
+            if(vis[top.second.first]==1){
+                continue
+            }
+            vis[top.second.first]=1
+            dist[top.second.first]=top.first
+            parent[top.second.first]=top.second.second
+            for(i in 0..(adj[top.second.first]!!.size - 1)){
+                queue.add(Pair(top.first+adj[top.second.first]!![i].second,Pair(adj[top.second.first]!![i].first,top.second.first)))
+            }
+        }
+        var path = ArrayList<LatLng>()
+        var found = 0
+        var curPoint = minIndex2
+        while(found == 0){
+            path.add(latlng[curPoint]!!)
+            Log.i("Adding point id:", curPoint.toString())
+            if(curPoint == 0){
+                found = 1
+            }
+            curPoint = parent[curPoint]
+        }
+        if(directionsLine != null){
+            directionsLine?.remove()
+        }
+        directionsLine = mapboxMap.addPolyline(PolylineOptions()
+                .addAll(path)
+                .color(Color.parseColor("#ED2939"))
+                .width(5f))
     }
 
     fun loadMap(savedInstanceState: Bundle?){
@@ -373,18 +474,17 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
     }
 
     override fun onLocationChanged(location: Location) {
-        if(active == 1) {
+        if (active == 1) {
             locationArray.add(location)
         }
-
+        mylocation = LatLng(location?.latitude!!, location?.longitude!!)
+    }
 //        val locationStr = "Latitude : " + location.latitude.toString() +
 //                "\nLongitude : " + location.longitude.toString() +
 //                "\nAccuracy : " + location.accuracy.toString() +
 //                "\nTime : " + location.time.toString()
 //
 //        Toast.makeText(this, locationStr, Toast.LENGTH_LONG).show()
-
-    }
 
     private fun placeMarker(mapboxMap: MapboxMap, lat: Double, lon: Double, title: String){
         mapboxMap.addMarker(MarkerOptions()
@@ -442,7 +542,11 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
 //        else{
 //            cardView.visibility = View.GONE
 //        }
-
+        //if(locationEngine != null) {
+        //    locationEngine?.requestLocationUpdates()
+        //}
+        //locationEngine?.lastLocation
+        pressedMarker = marker
         card_trek_place.text = marker.title
         card_trek_info.text = "Hey this is a cool place"
     }
