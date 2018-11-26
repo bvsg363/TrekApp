@@ -44,7 +44,7 @@
 
         <activity
             android:name=".MapActivity"
-            android:label="@string/title_activity_map"/>
+            android:label="@string/title_activity_map" />
         <activity android:name=".PastTreks" />
         <activity android:name=".mapBox">
 
@@ -56,7 +56,8 @@
             </intent-filter
             -->
         </activity>
-        <activity android:name=".DownloadMap"/>
+        <activity android:name=".DownloadMap" />
+        <activity android:name=".PlaceInfo"></activity>
     </application>
 
 </manifest>

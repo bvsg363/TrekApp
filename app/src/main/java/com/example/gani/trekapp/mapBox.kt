@@ -1,6 +1,7 @@
 package com.example.gani.trekapp
 
 import android.annotation.SuppressLint
+import android.content.Intent
 import android.graphics.Color
 import android.location.Location
 import android.support.v7.app.AppCompatActivity
@@ -12,6 +13,7 @@ import android.view.View.GONE
 import android.view.View.VISIBLE
 import com.google.android.gms.maps.CameraUpdateFactory
 import android.widget.Toast
+import com.google.gson.JsonArray
 import com.mapbox.android.core.location.LocationEngine
 import com.mapbox.android.core.location.LocationEngineListener
 import com.mapbox.android.core.location.LocationEngineProvider
@@ -61,16 +63,21 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
         }
 
         card_get_directions.setOnClickListener {
-            Toast.makeText(this, "hi", Toast.LENGTH_SHORT).show()
+//            Toast.makeText(this, "hi", Toast.LENGTH_SHORT).show()
+            getDirections()
         }
 
         cardView.setOnClickListener {
 
         }
 
-
+        card_get_info.setOnClickListener {
+            displayPlaceInfo()
+        }
 
         loadMap(savedInstanceState)
+
+
     }
 
     fun loadMap(savedInstanceState: Bundle?){
@@ -304,5 +311,17 @@ class mapBox : AppCompatActivity(), PermissionsListener, LocationEngineListener 
         if (cardView.visibility.equals(VISIBLE)){
             cardView.visibility = View.GONE
         }
+    }
+
+    fun displayPlaceInfo(){
+        val loginIntent = Intent(this, PlaceInfo::class.java)
+        intent.putExtra("place", card_trek_place.text)
+        startActivity(loginIntent)
+    }
+
+    fun getDirections(){
+
+//        val location = LocationEngine.
+
     }
 }
